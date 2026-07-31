@@ -85,11 +85,12 @@ struct PetCharacterDefinition {
     let defaultPoseID: PetPoseID
     let fallbackPoseID: PetPoseID
     let menuPoseIDs: [PetPoseID]
-    let clickReaction: PetTemporaryPose?
     let automaticPoseConfiguration: PetAutomaticPoseConfiguration?
 
     private let appearances: [PetPoseID: PetPoseAppearance]
     private let fallbackAppearance: PetPoseAppearance
+    private let defaultClickReaction: PetTemporaryPose?
+    private let clickReactionOverrides: [PetPoseID: PetTemporaryPose]
 
     init(
         id: String,
@@ -100,6 +101,7 @@ struct PetCharacterDefinition {
         menuPoseIDs: [PetPoseID],
         additionalAppearances: [PetPoseAppearance],
         clickReaction: PetTemporaryPose?,
+        clickReactionOverrides: [PetPoseID: PetTemporaryPose],
         automaticPoseConfiguration: PetAutomaticPoseConfiguration?
     ) {
         var appearances = [fallbackAppearance.id: fallbackAppearance]
@@ -113,8 +115,12 @@ struct PetCharacterDefinition {
         self.defaultPoseID = defaultPoseID
         self.fallbackPoseID = fallbackAppearance.id
         self.menuPoseIDs = menuPoseIDs.filter { appearances[$0] != nil }
-        self.clickReaction = clickReaction.flatMap {
+        self.defaultClickReaction = clickReaction.flatMap {
             appearances[$0.poseID] == nil ? nil : $0
+        }
+        self.clickReactionOverrides = clickReactionOverrides.filter {
+            appearances[$0.key] != nil
+                && appearances[$0.value.poseID] != nil
         }
 
         if let configuration = automaticPoseConfiguration {
@@ -122,7 +128,6 @@ struct PetCharacterDefinition {
                 let poseID = $0.temporaryPose.poseID
                 return $0.weight > 0
                     && poseID != defaultPoseID
-                    && poseID != .loading
                     && appearances[poseID] != nil
             }
             let automaticPoseIDs = Set(
@@ -152,5 +157,9 @@ struct PetCharacterDefinition {
 
     func appearance(for poseID: PetPoseID) -> PetPoseAppearance {
         appearances[poseID] ?? fallbackAppearance
+    }
+
+    func clickReaction(for poseID: PetPoseID) -> PetTemporaryPose? {
+        clickReactionOverrides[poseID] ?? defaultClickReaction
     }
 }

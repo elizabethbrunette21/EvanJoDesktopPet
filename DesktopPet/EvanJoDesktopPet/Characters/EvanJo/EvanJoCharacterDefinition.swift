@@ -1,5 +1,16 @@
 import SwiftUI
 
+private enum EvanJoPoseTiming {
+    // One deterministic pass through each non-looping animated renderer.
+    static let happyAnimation: TimeInterval = 0.95
+    static let thinkingAnimation: TimeInterval = 4.35
+    static let sleepyAnimation: TimeInterval = 1.42
+
+    static let automaticSettledHold: TimeInterval = 10
+    static let clickHappySettledHold: TimeInterval = 4.5
+    static let loadingPresentation: TimeInterval = 12
+}
+
 enum EvanJoCharacterDefinition {
     static let character: PetCharacterDefinition = {
         let normalPanelSize = CGSize(width: 125, height: 132)
@@ -84,17 +95,29 @@ enum EvanJoCharacterDefinition {
             panelSize: sleepyPanelSize,
             customRenderer: { AnyView(EvanJoSleepyAnimatedView()) }
         )
-        let happyReaction = PetTemporaryPose(
+        let automaticHappyExpression = PetTemporaryPose(
             poseID: .happy,
-            duration: 1.8
+            duration: EvanJoPoseTiming.happyAnimation
+                + EvanJoPoseTiming.automaticSettledHold
+        )
+        let clickHappyReaction = PetTemporaryPose(
+            poseID: .happy,
+            duration: EvanJoPoseTiming.happyAnimation
+                + EvanJoPoseTiming.clickHappySettledHold
         )
         let thinkingExpression = PetTemporaryPose(
             poseID: .thinking,
-            duration: 5
+            duration: EvanJoPoseTiming.thinkingAnimation
+                + EvanJoPoseTiming.automaticSettledHold
         )
         let sleepyExpression = PetTemporaryPose(
             poseID: .sleepy,
-            duration: 8
+            duration: EvanJoPoseTiming.sleepyAnimation
+                + EvanJoPoseTiming.automaticSettledHold
+        )
+        let loadingExpression = PetTemporaryPose(
+            poseID: .loading,
+            duration: EvanJoPoseTiming.loadingPresentation
         )
 
         return PetCharacterDefinition(
@@ -105,22 +128,27 @@ enum EvanJoCharacterDefinition {
             fallbackAppearance: idle,
             menuPoseIDs: [.idle, .happy, .loading, .thinking, .sleepy],
             additionalAppearances: [happy, loading, thinking, sleepy],
-            clickReaction: happyReaction,
+            clickReaction: clickHappyReaction,
+            clickReactionOverrides: [.loading: sleepyExpression],
             automaticPoseConfiguration: PetAutomaticPoseConfiguration(
                 initialIdleDelay: 6...10,
-                recoveryIdleDelay: 4...7,
+                recoveryIdleDelay: 20...30,
                 weightedPoses: [
                     PetWeightedTemporaryPose(
                         temporaryPose: thinkingExpression,
-                        weight: 40
+                        weight: 32
                     ),
                     PetWeightedTemporaryPose(
-                        temporaryPose: happyReaction,
-                        weight: 35
+                        temporaryPose: automaticHappyExpression,
+                        weight: 28
                     ),
                     PetWeightedTemporaryPose(
                         temporaryPose: sleepyExpression,
-                        weight: 25
+                        weight: 20
+                    ),
+                    PetWeightedTemporaryPose(
+                        temporaryPose: loadingExpression,
+                        weight: 20
                     )
                 ],
                 cooldownSelections: [.sleepy: 2]

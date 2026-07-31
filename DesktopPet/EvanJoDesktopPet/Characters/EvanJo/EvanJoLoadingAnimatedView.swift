@@ -6,7 +6,21 @@ enum EvanJoLoadingLayout {
     static let bodyRestingOffsetY: CGFloat = 7
     static let textImageSize: CGFloat = 180
     static let textRestingOffsetY: CGFloat = 17
-    static let textStartOffsetX: CGFloat = 82
+    // EvanJoLoadingText has visible alpha content in source columns 222..<1051.
+    static let textAssetCanvasWidth: CGFloat = 1254
+    static let textAssetVisibleMinX: CGFloat = 222
+    static let textAssetVisibleMaxX: CGFloat = 1051
+    static let textEntryMargin: CGFloat = 12
+    static let textVisibleWidth = textImageSize
+        * (textAssetVisibleMaxX - textAssetVisibleMinX)
+        / textAssetCanvasWidth
+    static let textVisibleCenterOffsetX = textImageSize
+        * (((textAssetVisibleMinX + textAssetVisibleMaxX) / 2)
+            / textAssetCanvasWidth - 0.5)
+    static let textStartOffsetX = panelSize.width / 2
+        + textVisibleWidth / 2
+        + textEntryMargin
+        - textVisibleCenterOffsetX
     static let textEndOffsetX: CGFloat = -180
     static let spinnerImageSize: CGFloat = 74
     static let spinnerRestingOffsetY: CGFloat = -28
@@ -32,6 +46,11 @@ struct EvanJoLoadingAnimatedView: View {
                     x: textOffsetX,
                     y: EvanJoLoadingLayout.textRestingOffsetY
                 )
+                .frame(
+                    width: EvanJoLoadingLayout.panelSize.width,
+                    height: EvanJoLoadingLayout.panelSize.height
+                )
+                .clipped()
 
             Image("EvanJoLoadingBody")
                 .resizable()
@@ -61,7 +80,6 @@ struct EvanJoLoadingAnimatedView: View {
             width: EvanJoLoadingLayout.panelSize.width,
             height: EvanJoLoadingLayout.panelSize.height
         )
-        .clipped()
         .onAppear(perform: startAnimation)
         .onDisappear(perform: stopAnimation)
     }
@@ -83,6 +101,8 @@ struct EvanJoLoadingAnimatedView: View {
             do {
                 while !Task.isCancelled {
                     resetTextPass()
+                    try await Task.sleep(nanoseconds: 150_000_000)
+                    guard !Task.isCancelled else { return }
 
                     withAnimation(.linear(duration: 2.8)) {
                         textOffsetX = EvanJoLoadingLayout.textEndOffsetX
@@ -93,9 +113,6 @@ struct EvanJoLoadingAnimatedView: View {
 
                     try await Task.sleep(nanoseconds: 400_000_000)
                     guard !Task.isCancelled else { return }
-
-                    resetTextPass()
-                    try await Task.sleep(nanoseconds: 150_000_000)
                 }
             } catch {
                 return

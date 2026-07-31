@@ -249,8 +249,9 @@ final class PetWindowController: NSObject {
     private func handleClick() {
         guard case .automatic = behaviorMode else { return }
         guard !isLoadingOverrideActive else { return }
-        guard !isInteractionSequenceActive else { return }
-        guard let clickReaction = character.clickReaction else { return }
+        guard let clickReaction = character.clickReaction(for: currentPoseID) else {
+            return
+        }
         startInteractionSequence(clickReaction)
     }
 
