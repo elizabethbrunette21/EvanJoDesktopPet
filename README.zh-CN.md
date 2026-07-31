@@ -4,7 +4,19 @@
 
 EvanJoDesktopPet 是一款使用 Swift、SwiftUI 和 AppKit 构建的小型原生 macOS 桌面宠物。它通过透明、不会激活应用的悬浮窗口显示宠物，并将所有行为和状态保存在本机。
 
-项目目前处于预发布 MVP 阶段。Evan Jo 是首个内置角色，窗口与行为引擎采用可复用结构，方便未来角色继续使用同一套应用架构。
+EvanJoDesktopPet 是一款已正式发布的 macOS 桌面宠物应用。Evan Jo 是首个内置角色，窗口与行为引擎采用可复用结构，方便未来角色继续使用同一套应用架构。
+
+## 下载
+
+[下载 EvanJoDesktopPet 0.1.0 macOS 安装包（.dmg）](https://github.com/elizabethbrunette21/EvanJoDesktopPet/releases/download/v0.1.0/EvanJoDesktopPet-0.1.0.dmg)
+
+- 需要 macOS 11.0 或更高版本
+- 支持 Apple Silicon 和 Intel Mac
+- 使用 Apple Developer ID 签名
+- 已通过 Apple 公证
+
+[查看全部版本](https://github.com/elizabethbrunette21/EvanJoDesktopPet/releases)
+
 
 ## 功能特色
 
@@ -50,9 +62,9 @@ DesktopPet/
 
 ## 项目状态
 
-应用当前可以作为本地 MVP 构建运行。自动姿势调度已经实现并通过构建验证；最终手动运行检查、发布打包、签名和公证仍待完成。
+0.1.0 版本已经完成手动运行测试、发布打包、Developer ID 签名和 Apple 公证。
 
-本仓库当前只发布源代码，不提供已签名和公证的二进制安装包。
+GitHub Release 已提供经过签名和 Apple 公证的 Universal macOS 安装包。
 
 ## 贡献
 

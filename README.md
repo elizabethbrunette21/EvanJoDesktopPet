@@ -4,7 +4,19 @@
 
 EvanJoDesktopPet is a small, native macOS desktop companion built in Swift with SwiftUI and AppKit. It renders a transparent, non-activating floating pet window and keeps all behavior and state local to the Mac.
 
-The project is currently a pre-release MVP. Evan Jo is the first bundled character, while the window and behavior engine are structured so future characters can reuse the same application.
+EvanJoDesktopPet is a released macOS desktop pet application. Evan Jo is the first bundled character, while the window and behavior engine are structured so future characters can reuse the same application.
+
+## Download
+
+[Download EvanJoDesktopPet 0.1.0 for macOS (.dmg)](https://github.com/elizabethbrunette21/EvanJoDesktopPet/releases/download/v0.1.0/EvanJoDesktopPet-0.1.0.dmg)
+
+- Requires macOS 11.0 or later
+- Supports Apple Silicon and Intel Macs
+- Signed with Apple Developer ID
+- Notarized by Apple
+
+[View all releases](https://github.com/elizabethbrunette21/EvanJoDesktopPet/releases)
+
 
 ## Features
 
@@ -50,9 +62,9 @@ All runtime assets required by the app are bundled in `DesktopPet/EvanJoDesktopP
 
 ## Project status
 
-The app builds as a local MVP. Automatic scheduling is implemented and build-verified; final manual runtime checks, release packaging, signing, and notarization are still pending.
+Version 0.1.0 has completed manual runtime testing, release packaging, Developer ID signing, and Apple notarization.
 
-This repository currently distributes source code only. A signed and notarized binary installer is not part of the current release.
+A signed and notarized Universal macOS installer is available from the GitHub Release page.
 
 ## Contributing
 
