@@ -1,16 +1,35 @@
 # Security Policy
 
-## Supported versions
+## Supported Versions
 
-EvanJoDesktopPet is currently pre-release. Security fixes are applied to the latest `main` branch.
+| Version | Supported |
+| --- | --- |
+| 0.1.x | Yes |
+| Earlier versions | No |
 
-## Reporting a vulnerability
+## Reporting a Vulnerability
 
-Please do not open a public issue for a vulnerability that could put users or their data at risk. Use GitHub's private vulnerability reporting feature for this repository when it is enabled.
+Please do not report security vulnerabilities through public GitHub Issues.
 
-Include the affected revision, macOS version, reproduction steps, expected impact, and any suggested mitigation. Please avoid including personal data, credentials, signing material, or unrelated system information.
+Use the **Report a vulnerability** button in this repository's **Security**
+section to submit a private report.
 
-## Privacy model
+Please include:
 
-The current application is local-only. It has no backend, account system, analytics, database, or network dependency. A change that introduces any of these capabilities requires an explicit security and privacy review.
+- The affected app version and build number
+- Your macOS version and Mac architecture
+- Steps to reproduce the issue
+- Expected and actual behavior
+- The possible security impact
+- A proof of concept, if available
 
+Please avoid public disclosure until the report has been investigated and a
+fix or mitigation is available.
+
+## Scope
+
+Security reports should concern the application, release artifacts,
+distribution process, repository secrets, or other security-sensitive
+behavior.
+
+General bugs and feature requests should be submitted through GitHub Issues.

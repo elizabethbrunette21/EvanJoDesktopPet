@@ -1,5 +1,15 @@
 # Working Memory
 
+<!-- document-status:archived-after-v0.1.0 -->
+
+> **Archived working note:** This document records pre-release development
+> context. The GitHub repository has since been created, `main` has been
+> pushed, and EvanJoDesktopPet v0.1.0 has been publicly released.
+>
+> For current project status, use the root README files, SECURITY.md, and the
+> latest GitHub Release.
+
+
 - **Current implementation identity:** `EvanJoDesktopPet` project, target, scheme, module, product, and source root; bundle identifier `com.elizabethbrunette.EvanJoDesktopPet`.
 - **Application source root:** `DesktopPet/` remains unchanged inside the Git worktree.
 - **Current character:** Evan Jo (`evan_jo`), using five static pose fallbacks plus character-specific layered renderers for Idle, Happy, Loading, Thinking, and Sleepy. The Pose menu presents internal Thinking as `Speechless` and internal Sleepy as `Brainwave`; program identifiers and asset names remain unchanged.

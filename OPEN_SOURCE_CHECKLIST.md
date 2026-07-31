@@ -1,5 +1,17 @@
 # Open-Source Release Checklist
 
+<!-- release-status:v0.1.0 -->
+
+> **Current status:** EvanJoDesktopPet v0.1.0 was publicly released on
+> 2026-07-31. The public repository, Git history, signed and notarized
+> Universal macOS DMG, release notes, README files, and license boundaries
+> have been completed and verified.
+>
+> The preparation notes below are retained as a historical record. Statements
+> describing the repository as unpublished or without a remote are no longer
+> the current project status.
+
+
 ## Repository hygiene
 
 - [x] Exclude the protected Hatch Pet run and personal reference images.

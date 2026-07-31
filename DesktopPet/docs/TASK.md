@@ -1,5 +1,14 @@
 # Current Task
 
+<!-- task-status:completed-v0.1.0 -->
+
+> **Completed:** The first public repository preparation and release task was
+> completed with EvanJoDesktopPet v0.1.0 on 2026-07-31.
+>
+> The content below is retained as the historical task specification rather
+> than an active task.
+
+
 > Prepare EvanJoDesktopPet for its first public Git commit.
 
 ## Status
