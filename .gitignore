@@ -32,3 +32,6 @@ DesktopPet/SourceAssets/
 
 # Bundled provenance-only artwork that is not used at runtime
 DesktopPet/EvanJoDesktopPet/Resources/Assets.xcassets/EvanJoThinkingReference.imageset/
+
+# Local release artifacts
+dist/

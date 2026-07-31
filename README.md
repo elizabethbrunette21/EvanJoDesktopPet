@@ -1,6 +1,8 @@
 # EvanJoDesktopPet
 
-EvanJoDesktopPet is a small, native macOS desktop companion built with SwiftUI and AppKit. It renders a transparent, non-activating floating pet window and keeps all behavior and state local to the Mac.
+**English** | [简体中文](README.zh-CN.md)
+
+EvanJoDesktopPet is a small, native macOS desktop companion built in Swift with SwiftUI and AppKit. It renders a transparent, non-activating floating pet window and keeps all behavior and state local to the Mac.
 
 The project is currently a pre-release MVP. Evan Jo is the first bundled character, while the window and behavior engine are structured so future characters can reuse the same application.
 
@@ -9,7 +11,7 @@ The project is currently a pre-release MVP. Evan Jo is the first bundled charact
 - Transparent, borderless floating window that does not take keyboard focus
 - Dragging, visible-screen clamping, and saved position restoration
 - Context menu with automatic and fixed poses, reset position, and quit
-- Local SwiftUI animations for Idle, Happy, Loading, Speechless, and Brainwave states
+- Layered SwiftUI animations for Idle, Happy, Loading, Thinking (shown as Speechless), and Sleepy (shown as Brainwave) poses
 - Automatic pose scheduling with cancellation-safe state transitions
 - No backend, account, analytics, network service, or third-party dependency
 
@@ -44,9 +46,13 @@ DesktopPet/
 
 Raw character references, generation runs, Xcode user state, signing material, and local build output are intentionally excluded from version control.
 
+All runtime assets required by the app are bundled in `DesktopPet/EvanJoDesktopPet/Resources/Assets.xcassets`. The local `DesktopPet/SourceAssets` directory contains source and rollback material, is excluded from version control, and is not a public runtime dependency.
+
 ## Project status
 
 The app builds as a local MVP. Automatic scheduling is implemented and build-verified; final manual runtime checks, release packaging, signing, and notarization are still pending.
+
+This repository currently distributes source code only. A signed and notarized binary installer is not part of the current release.
 
 ## Contributing
 
@@ -62,8 +68,9 @@ The source code and project documentation are open source under the
 [MIT License](LICENSE).
 
 The Evan Jo character name, identity, character design, illustrations,
-animation layers, and other visual assets are **not** licensed under MIT and
-are not open source. They may be used only as necessary to build, run, test,
-and evaluate this project for non-commercial purposes. Standalone reuse,
-redistribution, derivative visual works, and commercial use are prohibited.
-See [ASSET_LICENSE.md](ASSET_LICENSE.md) for the complete terms.
+animation layers, visual effects, and other visual assets are **not** licensed
+under MIT and are not open source. They may be used only as necessary to
+build, run, test, and evaluate this project for non-commercial purposes.
+Standalone reuse, redistribution, derivative visual works, and commercial use
+are prohibited. See [ASSET_LICENSE.md](ASSET_LICENSE.md) for the complete
+terms.
