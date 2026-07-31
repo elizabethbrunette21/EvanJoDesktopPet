@@ -1,0 +1,345 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000001 /* EvanJoDesktopPetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000001 /* EvanJoDesktopPetApp.swift */; };
+		A00000000000000000000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000002 /* AppDelegate.swift */; };
+		A00000000000000000000003 /* PetRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000003 /* PetRootView.swift */; };
+		A00000000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000004 /* Assets.xcassets */; };
+		A00000000000000000000005 /* PetWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000006 /* PetWindowController.swift */; };
+		A00000000000000000000006 /* PetPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000007 /* PetPanel.swift */; };
+		A00000000000000000000007 /* PetInteractionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000008 /* PetInteractionView.swift */; };
+		A00000000000000000000008 /* PetCharacterDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000009 /* PetCharacterDefinition.swift */; };
+		A00000000000000000000009 /* EvanJoCharacterDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000A /* EvanJoCharacterDefinition.swift */; };
+		A0000000000000000000000A /* EvanJoIdleAnimatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000B /* EvanJoIdleAnimatedView.swift */; };
+		A0000000000000000000000B /* EvanJoHappyAnimatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000C /* EvanJoHappyAnimatedView.swift */; };
+		A0000000000000000000000C /* EvanJoIdlePettingTrackingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000D /* EvanJoIdlePettingTrackingView.swift */; };
+		A0000000000000000000000D /* EvanJoLoadingAnimatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000E /* EvanJoLoadingAnimatedView.swift */; };
+		A0000000000000000000000E /* EvanJoThinkingAnimatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000F /* EvanJoThinkingAnimatedView.swift */; };
+		A0000000000000000000000F /* EvanJoSleepyAnimatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000010 /* EvanJoSleepyAnimatedView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B00000000000000000000001 /* EvanJoDesktopPetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvanJoDesktopPetApp.swift; sourceTree = "<group>"; };
+		B00000000000000000000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B00000000000000000000003 /* PetRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetRootView.swift; sourceTree = "<group>"; };
+		B00000000000000000000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B00000000000000000000005 /* EvanJoDesktopPet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EvanJoDesktopPet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B00000000000000000000006 /* PetWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetWindowController.swift; sourceTree = "<group>"; };
+		B00000000000000000000007 /* PetPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetPanel.swift; sourceTree = "<group>"; };
+		B00000000000000000000008 /* PetInteractionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetInteractionView.swift; sourceTree = "<group>"; };
+		B00000000000000000000009 /* PetCharacterDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCharacterDefinition.swift; sourceTree = "<group>"; };
+		B0000000000000000000000A /* EvanJoCharacterDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvanJoCharacterDefinition.swift; sourceTree = "<group>"; };
+		B0000000000000000000000B /* EvanJoIdleAnimatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvanJoIdleAnimatedView.swift; sourceTree = "<group>"; };
+		B0000000000000000000000C /* EvanJoHappyAnimatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvanJoHappyAnimatedView.swift; sourceTree = "<group>"; };
+		B0000000000000000000000D /* EvanJoIdlePettingTrackingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvanJoIdlePettingTrackingView.swift; sourceTree = "<group>"; };
+		B0000000000000000000000E /* EvanJoLoadingAnimatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvanJoLoadingAnimatedView.swift; sourceTree = "<group>"; };
+		B0000000000000000000000F /* EvanJoThinkingAnimatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvanJoThinkingAnimatedView.swift; sourceTree = "<group>"; };
+		B00000000000000000000010 /* EvanJoSleepyAnimatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvanJoSleepyAnimatedView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D00000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C00000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000002 /* EvanJoDesktopPet */,
+				C00000000000000000000007 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C00000000000000000000002 /* EvanJoDesktopPet */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000003 /* App */,
+				C00000000000000000000004 /* Features */,
+				C00000000000000000000008 /* Characters */,
+				C00000000000000000000006 /* Resources */,
+			);
+			path = EvanJoDesktopPet;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000003 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000001 /* EvanJoDesktopPetApp.swift */,
+				B00000000000000000000002 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000004 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000005 /* DesktopPet */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000005 /* DesktopPet */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000009 /* PetCharacterDefinition.swift */,
+				B00000000000000000000003 /* PetRootView.swift */,
+				B00000000000000000000006 /* PetWindowController.swift */,
+				B00000000000000000000007 /* PetPanel.swift */,
+				B00000000000000000000008 /* PetInteractionView.swift */,
+			);
+			path = DesktopPet;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000006 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000004 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000008 /* Characters */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000009 /* EvanJo */,
+			);
+			path = Characters;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000009 /* EvanJo */ = {
+			isa = PBXGroup;
+			children = (
+				B0000000000000000000000A /* EvanJoCharacterDefinition.swift */,
+				B0000000000000000000000B /* EvanJoIdleAnimatedView.swift */,
+				B0000000000000000000000C /* EvanJoHappyAnimatedView.swift */,
+				B0000000000000000000000D /* EvanJoIdlePettingTrackingView.swift */,
+				B0000000000000000000000E /* EvanJoLoadingAnimatedView.swift */,
+				B0000000000000000000000F /* EvanJoThinkingAnimatedView.swift */,
+				B00000000000000000000010 /* EvanJoSleepyAnimatedView.swift */,
+			);
+			path = EvanJo;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000007 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000005 /* EvanJoDesktopPet.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E00000000000000000000001 /* EvanJoDesktopPet */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 200000000000000000000002 /* Build configuration list for PBXNativeTarget "EvanJoDesktopPet" */;
+			buildPhases = (
+				D00000000000000000000001 /* Sources */,
+				D00000000000000000000002 /* Frameworks */,
+				D00000000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EvanJoDesktopPet;
+			productName = EvanJoDesktopPet;
+			productReference = B00000000000000000000005 /* EvanJoDesktopPet.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					E00000000000000000000001 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+				};
+			};
+			buildConfigurationList = 200000000000000000000001 /* Build configuration list for PBXProject "EvanJoDesktopPet" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C00000000000000000000001;
+			productRefGroup = C00000000000000000000007 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E00000000000000000000001 /* EvanJoDesktopPet */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D00000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000004 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D00000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000001 /* EvanJoDesktopPetApp.swift in Sources */,
+				A00000000000000000000002 /* AppDelegate.swift in Sources */,
+				A00000000000000000000003 /* PetRootView.swift in Sources */,
+				A00000000000000000000005 /* PetWindowController.swift in Sources */,
+				A00000000000000000000006 /* PetPanel.swift in Sources */,
+				A00000000000000000000007 /* PetInteractionView.swift in Sources */,
+				A00000000000000000000008 /* PetCharacterDefinition.swift in Sources */,
+				A00000000000000000000009 /* EvanJoCharacterDefinition.swift in Sources */,
+				A0000000000000000000000A /* EvanJoIdleAnimatedView.swift in Sources */,
+				A0000000000000000000000B /* EvanJoHappyAnimatedView.swift in Sources */,
+				A0000000000000000000000C /* EvanJoIdlePettingTrackingView.swift in Sources */,
+				A0000000000000000000000D /* EvanJoLoadingAnimatedView.swift in Sources */,
+				A0000000000000000000000E /* EvanJoThinkingAnimatedView.swift in Sources */,
+				A0000000000000000000000F /* EvanJoSleepyAnimatedView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		100000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		100000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		100000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = EvanJoDesktopPet;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.elizabethbrunette.EvanJoDesktopPet;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		100000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = EvanJoDesktopPet;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.elizabethbrunette.EvanJoDesktopPet;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		200000000000000000000001 /* Build configuration list for PBXProject "EvanJoDesktopPet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				100000000000000000000001 /* Debug */,
+				100000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		200000000000000000000002 /* Build configuration list for PBXNativeTarget "EvanJoDesktopPet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				100000000000000000000003 /* Debug */,
+				100000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F00000000000000000000001 /* Project object */;
+}

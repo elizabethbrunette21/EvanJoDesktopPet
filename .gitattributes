@@ -1,0 +1,16 @@
+* text=auto
+
+*.md text eol=lf
+*.swift text eol=lf
+*.json text eol=lf
+*.pbxproj text eol=lf
+*.plist text eol=lf
+*.xcworkspacedata text eol=lf
+
+*.gif binary
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.webp binary
+*.xcuserstate binary
+
