@@ -23,7 +23,7 @@ EvanJoDesktopPet is a released macOS desktop pet application. Evan Jo is the fir
 - Transparent, borderless floating window that does not take keyboard focus
 - Dragging, visible-screen clamping, and saved position restoration
 - Context menu with automatic and fixed poses, reset position, and quit
-- Layered SwiftUI animations for Idle, Happy, Loading, Thinking (shown as Speechless), and Sleepy (shown as Brainwave) poses
+- Layered SwiftUI animations for Idle, Happy, Loading, Speechless, and Brainwave poses
 - Automatic pose scheduling with cancellation-safe state transitions
 - No backend, account, analytics, network service, or third-party dependency
 

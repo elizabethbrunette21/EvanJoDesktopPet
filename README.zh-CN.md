@@ -23,7 +23,7 @@ EvanJoDesktopPet 是一款已正式发布的 macOS 桌面宠物应用。Evan Jo 
 - 不抢占键盘焦点的透明无边框悬浮窗口
 - 支持拖动、可见屏幕范围限制和位置保存与恢复
 - 提供自动与固定姿势、重置位置和退出功能的上下文菜单
-- 为 Idle、Happy、Loading、Thinking（前端显示为 Speechless）和 Sleepy（前端显示为 Brainwave）提供 SwiftUI 分层动画
+- 为 Idle、Happy、Loading、Speechless和Brainwave提供 SwiftUI 分层动画
 - 使用支持安全取消和状态切换的自动姿势调度逻辑
 - 不依赖后端、账户、分析服务、网络服务或第三方依赖
 
