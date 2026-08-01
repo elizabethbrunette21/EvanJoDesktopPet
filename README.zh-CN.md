@@ -8,6 +8,14 @@ EvanJoDesktopPet 是一款已正式发布的 macOS 桌面宠物应用。Evan Jo 
 
 ## 下载
 
+### Homebrew
+
+```bash
+brew install --cask elizabethbrunette21/tap/evan-jo-desktop-pet
+```
+
+### 直接下载
+
 [下载 EvanJoDesktopPet 0.1.0 macOS 安装包（.dmg）](https://github.com/elizabethbrunette21/EvanJoDesktopPet/releases/download/v0.1.0/EvanJoDesktopPet-0.1.0.dmg)
 
 - 需要 macOS 11.0 或更高版本
