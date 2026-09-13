@@ -1,0 +1,149 @@
+<UserControl x:Class="EvanJoDesktopPet.Windows.Characters.EvanJo.Animation.EvanJoIdleAnimationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:interaction="clr-namespace:EvanJoDesktopPet.Windows.Characters.EvanJo.Interaction"
+             Width="160"
+             Height="148"
+             Focusable="False"
+             SnapsToDevicePixels="True"
+             UseLayoutRounding="True">
+    <Canvas Width="160"
+            Height="148"
+            ClipToBounds="True">
+        <Image x:Name="BodyImage"
+               Canvas.Left="18.5"
+               Canvas.Top="61.5"
+               Width="123"
+               Height="123"
+               Stretch="Uniform" />
+
+        <Image x:Name="HeadImage"
+               Canvas.Left="10.5"
+               Canvas.Top="-3"
+               Width="139"
+               Height="139"
+               RenderTransformOrigin="0.5,1"
+               Stretch="Uniform">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="HeadScaleTransform" />
+                    <TranslateTransform x:Name="HeadTranslateTransform" />
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+        <Image x:Name="Sparkle01Image"
+               Canvas.Left="10.5"
+               Canvas.Top="-3"
+               Width="139"
+               Height="139"
+               Opacity="0"
+               RenderTransformOrigin="0.5,0.5"
+               Stretch="Uniform">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="Sparkle01ScaleTransform"
+                                    ScaleX="0.42"
+                                    ScaleY="0.42" />
+                    <TranslateTransform x:Name="Sparkle01TranslateTransform" />
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+        <Image x:Name="Sparkle02Image"
+               Canvas.Left="10.5"
+               Canvas.Top="-3"
+               Width="139"
+               Height="139"
+               Opacity="0"
+               RenderTransformOrigin="0.5,0.5"
+               Stretch="Uniform">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="Sparkle02ScaleTransform"
+                                    ScaleX="0.42"
+                                    ScaleY="0.42" />
+                    <TranslateTransform x:Name="Sparkle02TranslateTransform" />
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+        <Image x:Name="Sparkle03Image"
+               Canvas.Left="10.5"
+               Canvas.Top="-3"
+               Width="139"
+               Height="139"
+               Opacity="0"
+               RenderTransformOrigin="0.5,0.5"
+               Stretch="Uniform">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="Sparkle03ScaleTransform"
+                                    ScaleX="0.42"
+                                    ScaleY="0.42" />
+                    <TranslateTransform x:Name="Sparkle03TranslateTransform" />
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+        <Image x:Name="Sparkle04Image"
+               Canvas.Left="10.5"
+               Canvas.Top="-3"
+               Width="139"
+               Height="139"
+               Opacity="0"
+               RenderTransformOrigin="0.5,0.5"
+               Stretch="Uniform">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="Sparkle04ScaleTransform"
+                                    ScaleX="0.42"
+                                    ScaleY="0.42" />
+                    <TranslateTransform x:Name="Sparkle04TranslateTransform" />
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+        <Image x:Name="Sparkle05Image"
+               Canvas.Left="10.5"
+               Canvas.Top="-3"
+               Width="139"
+               Height="139"
+               Opacity="0"
+               RenderTransformOrigin="0.5,0.5"
+               Stretch="Uniform">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="Sparkle05ScaleTransform"
+                                    ScaleX="0.42"
+                                    ScaleY="0.42" />
+                    <TranslateTransform x:Name="Sparkle05TranslateTransform" />
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+        <Image x:Name="SparkleDotImage"
+               Canvas.Left="10.5"
+               Canvas.Top="-3"
+               Width="139"
+               Height="139"
+               Opacity="0"
+               RenderTransformOrigin="0.5,0.5"
+               Stretch="Uniform">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="SparkleDotScaleTransform"
+                                    ScaleX="0.42"
+                                    ScaleY="0.42" />
+                    <TranslateTransform x:Name="SparkleDotTranslateTransform" />
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+        <interaction:EvanJoHeadPetInteractionView x:Name="HeadPetInteraction"
+                                                   Canvas.Left="30.5"
+                                                   Canvas.Top="24"
+                                                   Width="99"
+                                                   Height="78" />
+    </Canvas>
+</UserControl>

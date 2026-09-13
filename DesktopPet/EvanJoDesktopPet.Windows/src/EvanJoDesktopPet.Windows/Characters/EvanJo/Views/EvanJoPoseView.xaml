@@ -1,0 +1,16 @@
+<UserControl x:Class="EvanJoDesktopPet.Windows.Characters.EvanJo.Views.EvanJoPoseView"
+             x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:animation="clr-namespace:EvanJoDesktopPet.Windows.Characters.EvanJo.Animation"
+             xmlns:desktopPet="clr-namespace:EvanJoDesktopPet.Windows.Features.DesktopPet">
+    <Grid>
+        <desktopPet:PetRenderer x:Name="StaticRenderer"
+                                CharacterDefinition="{Binding CharacterDefinition, ElementName=Root}"
+                                Pose="{Binding Pose, ElementName=Root}" />
+        <animation:EvanJoIdleAnimationView x:Name="IdleAnimationView"
+                                            Visibility="Collapsed" />
+        <animation:EvanJoHappyAnimationView x:Name="HappyAnimationView"
+                                             Visibility="Collapsed" />
+    </Grid>
+</UserControl>

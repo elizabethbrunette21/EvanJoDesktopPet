@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RootNamespace>EvanJoDesktopPet.Windows</RootNamespace>
+    <AssemblyName>EvanJoDesktopPet.Windows</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Characters\**\*.png" />
+  </ItemGroup>
+</Project>

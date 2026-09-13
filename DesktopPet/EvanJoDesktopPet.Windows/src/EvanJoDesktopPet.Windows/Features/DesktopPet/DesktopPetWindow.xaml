@@ -1,0 +1,19 @@
+<windowing:TransparentPetWindow x:Class="EvanJoDesktopPet.Windows.Features.DesktopPet.DesktopPetWindow"
+                                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                xmlns:evanJo="clr-namespace:EvanJoDesktopPet.Windows.Characters.EvanJo.Views"
+                                xmlns:windowing="clr-namespace:EvanJoDesktopPet.Windows.Platform.Windowing"
+                                Title="EvanJoDesktopPet"
+                                Width="160"
+                                Height="148"
+                                SnapsToDevicePixels="True"
+                                UseLayoutRounding="True"
+                                WindowStartupLocation="Manual">
+    <Grid x:Name="PetSurface"
+          MouseLeftButtonDown="PetSurface_OnMouseLeftButtonDown"
+          MouseRightButtonUp="PetSurface_OnMouseRightButtonUp">
+        <evanJo:EvanJoPoseView x:Name="PoseView"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+    </Grid>
+</windowing:TransparentPetWindow>
