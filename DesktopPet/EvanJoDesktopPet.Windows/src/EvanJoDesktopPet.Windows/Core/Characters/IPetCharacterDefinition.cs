@@ -20,5 +20,7 @@ public interface IPetCharacterDefinition
 
     IReadOnlyDictionary<PetPoseId, Uri> PoseAssets { get; }
 
+    IReadOnlyDictionary<PetPoseId, PetPosePresentation> PosePresentations { get; }
+
     string GetPoseDisplayName(PetPoseId pose);
 }

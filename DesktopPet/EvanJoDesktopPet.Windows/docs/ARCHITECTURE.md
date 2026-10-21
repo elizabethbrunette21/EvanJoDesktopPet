@@ -1,54 +1,33 @@
 # Windows architecture
 
-## Purpose
+The independent .NET 8 WPF application uses the Swift/macOS app as its visual
+reference. It has no third-party runtime dependencies.
 
-The Windows app is an independent WPF implementation that uses the existing macOS app as a behavioral and product reference. It does not share build files, source files, or runtime assets with the Swift project.
+`Core/Characters` defines character identity, pose IDs, static assets and static
+presentation parameters. `Core/Behavior` manages selected poses and cancellable
+click reactions; it does not schedule autonomous expressions.
 
-## Phase 2 boundaries
+`Features/DesktopPet` owns window placement, dragging, menus and the generic
+static fallback renderer. The window sizes to its content. Character dimensions
+and animation assets stay in `Characters/EvanJo`, rather than in window code.
 
-`App.xaml` is the WPF application entry point and opens `DesktopPetWindow`.
+`EvanJoPoseView` owns a constant 240 x 184 DIP surface and selects the active
+renderer. Idle retains its original 160 x 148 layout with a 28 DIP top inset.
+Happy uses its native head/body dimensions and enlarges each existing flower crop
+around its centre. Loading, Thinking and Sleepy use
+`EvanJoExpressionAnimationView`: three local scene builders and native WPF
+storyboards. Their complete compositions are scaled using the visible body
+bounds, aligned to x=120 and feet y=176, and clipped only at the outer surface.
+Loading text additionally has its own clipping region.
 
-`Core/Characters` defines the open-ended character contract and string-backed `PetPoseId` identity. A future character may create a new `PetPoseId` without changing a shared enum.
+A selected renderer starts after it is loaded and visible. Switching poses
+removes its controllable storyboard; selecting the same pose again creates a
+fresh playback. Missing layer sets fall back to the existing static renderer.
+All resource PNGs are bundled by the existing project resource glob.
 
-`Characters/EvanJo` owns Evan Jo's identity, five static pose labels, and pose-to-resource mapping. `EvanJoPoseView` only hosts the selected pose renderer; it does not own window movement, placement, menus, animation, or behavior.
+`Platform/Windowing` owns transparency and native window policy. It must remain
+independent of character names, assets and animations.
 
-`Features/DesktopPet` owns the desktop-pet window lifecycle: initial placement, dragging, and the context menu. `PetRenderer` renders a requested pose from any `IPetCharacterDefinition` and falls back through that definition when a requested asset is unavailable.
-
-`Platform/Windowing` isolates WPF window policy. `TransparentPetWindow` supplies the transparent, borderless, topmost, taskbar-hidden, non-activating shell expected by a desktop pet. Future Windows interop should remain inside this platform boundary.
-
-## Dependency direction
-
-```text
-App.xaml
-  -> Features/DesktopPet/DesktopPetWindow
-       -> Characters/EvanJo/EvanJoCharacterDefinition
-       -> Characters/EvanJo/Views/EvanJoPoseView
-            -> Features/DesktopPet/PetRenderer
-                 -> Core/Characters/IPetCharacterDefinition
-       -> Platform/Windowing/TransparentPetWindow
-```
-
-The feature layer may depend on the Windows platform layer. The platform layer must not depend on characters, assets, or behavior.
-
-## Current window behavior
-
-- Window surface: 160 × 148 device-independent pixels, matching the macOS Idle panel.
-- Character canvas: 125 × 132 device-independent pixels, matching the macOS static fallback canvas. `PetRenderer` uses `Stretch="Uniform"` to preserve each PNG's aspect ratio and transparent margins.
-- Initial placement: primary display working area, 24 px from the right and bottom edges.
-- Pointer handling: only the centered character canvas receives pointer events; the surrounding transparent window margin has no background and does not receive hits.
-- Context menu: a definition-driven Pose submenu (Idle, Happy, Loading, Thinking, Sleepy), Reset Position, and Quit EvanJoDesktopPet.
-
-## Explicitly deferred
-
-- character switching
-- animation and pose transitions
-- click reactions and gestures
-- automatic or scheduled behavior
-- screen clamping after dragging and saved position
-- startup integration, packaging, and distribution
-
-These items require a later approved phase.
-
-## macOS reference boundary
-
-The `EvanJoDesktopPet` Swift source directory and `EvanJoDesktopPet.xcodeproj` remain the reference implementation. Windows work must stay under `EvanJoDesktopPet.Windows` and must not rename, move, or edit the macOS project.
+The Windows implementation does not modify the Swift source, Xcode project or
+original artwork. New runtime layers are byte-identical copies of the approved
+macOS Asset Catalog resources.

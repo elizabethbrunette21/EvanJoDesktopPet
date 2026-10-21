@@ -28,6 +28,16 @@ public sealed class EvanJoCharacterDefinition : IPetCharacterDefinition
             [PetPoseId.Sleepy] = "Sleepy"
         };
 
+    private static readonly IReadOnlyDictionary<PetPoseId, PetPosePresentation> posePresentations =
+        new Dictionary<PetPoseId, PetPosePresentation>
+        {
+            [PetPoseId.Idle] = PetPosePresentation.Default,
+            [PetPoseId.Happy] = new(156, 140, 1.18, 0, PetPoseAlignment.Bottom),
+            [PetPoseId.Loading] = PetPosePresentation.Default,
+            [PetPoseId.Thinking] = PetPosePresentation.Default,
+            [PetPoseId.Sleepy] = new(125, 132, 1.16, 7)
+        };
+
     public string Id => "evan_jo";
 
     public string DisplayName => "Evan Jo";
@@ -39,6 +49,9 @@ public sealed class EvanJoCharacterDefinition : IPetCharacterDefinition
     public PetPoseId FallbackPose => PetPoseId.Idle;
 
     public IReadOnlyDictionary<PetPoseId, Uri> PoseAssets => EvanJoPoseAssets.ByPose;
+
+    public IReadOnlyDictionary<PetPoseId, PetPosePresentation> PosePresentations =>
+        posePresentations;
 
     public string GetPoseDisplayName(PetPoseId pose) =>
         poseDisplayNames.TryGetValue(pose, out var displayName)

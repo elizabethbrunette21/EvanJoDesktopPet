@@ -9,5 +9,10 @@
     <Image x:Name="PoseImage"
            Stretch="Uniform"
            SnapsToDevicePixels="True"
-           UseLayoutRounding="True" />
+           UseLayoutRounding="True"
+           RenderTransformOrigin="0.5,0.5">
+        <Image.RenderTransform>
+            <ScaleTransform x:Name="PresentationScaleTransform" />
+        </Image.RenderTransform>
+    </Image>
 </UserControl>

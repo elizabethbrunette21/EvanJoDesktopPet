@@ -1,5 +1,5 @@
 <UserControl x:Class="EvanJoDesktopPet.Windows.Characters.EvanJo.Views.EvanJoPoseView"
-             x:Name="Root"
+             x:Name="Root" Width="240" Height="184" ClipToBounds="True"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:animation="clr-namespace:EvanJoDesktopPet.Windows.Characters.EvanJo.Animation"
@@ -9,8 +9,17 @@
                                 CharacterDefinition="{Binding CharacterDefinition, ElementName=Root}"
                                 Pose="{Binding Pose, ElementName=Root}" />
         <animation:EvanJoIdleAnimationView x:Name="IdleAnimationView"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Margin="0,28,0,0"
                                             Visibility="Collapsed" />
         <animation:EvanJoHappyAnimationView x:Name="HappyAnimationView"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Bottom"
                                              Visibility="Collapsed" />
+        <ContentControl x:Name="ExpressionHost"
+                        HorizontalContentAlignment="Left"
+                        VerticalContentAlignment="Top"
+                        Visibility="Collapsed" />
     </Grid>
 </UserControl>

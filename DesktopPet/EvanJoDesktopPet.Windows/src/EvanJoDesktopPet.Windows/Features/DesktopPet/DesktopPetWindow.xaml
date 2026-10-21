@@ -4,8 +4,7 @@
                                 xmlns:evanJo="clr-namespace:EvanJoDesktopPet.Windows.Characters.EvanJo.Views"
                                 xmlns:windowing="clr-namespace:EvanJoDesktopPet.Windows.Platform.Windowing"
                                 Title="EvanJoDesktopPet"
-                                Width="160"
-                                Height="148"
+                                SizeToContent="WidthAndHeight"
                                 SnapsToDevicePixels="True"
                                 UseLayoutRounding="True"
                                 WindowStartupLocation="Manual">

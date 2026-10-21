@@ -53,6 +53,13 @@ public partial class EvanJoHappyAnimationView : UserControl
 
         Loaded += OnLoaded;
         Unloaded += (_, _) => animationController.Stop();
+        IsVisibleChanged += (_, _) =>
+        {
+            if (IsVisible && isAnimationRequested && IsLoaded && IsLayerSetAvailable)
+                animationController.Start();
+            else if (!IsVisible)
+                animationController.Stop();
+        };
     }
 
     public bool IsLayerSetAvailable { get; }
@@ -61,7 +68,7 @@ public partial class EvanJoHappyAnimationView : UserControl
     {
         isAnimationRequested = true;
 
-        if (IsLoaded && IsLayerSetAvailable)
+        if (IsLoaded && IsVisible && IsLayerSetAvailable)
         {
             animationController.Start();
         }
@@ -75,7 +82,7 @@ public partial class EvanJoHappyAnimationView : UserControl
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        if (isAnimationRequested && IsLayerSetAvailable)
+        if (isAnimationRequested && IsVisible && IsLayerSetAvailable)
         {
             animationController.Start();
         }
@@ -89,14 +96,13 @@ public partial class EvanJoHappyAnimationView : UserControl
             HeadImage.Source = LoadImage("Head/evan_jo_happy_head.png");
             JumpLinesImage.Source = LoadImage("JumpLines/evan_jo_happy_jump_lines.png");
 
-            var flowers = LoadImage("Flowers/evan_jo_happy_flowers.png");
-            Flower01Image.Source = flowers;
-            Flower02Image.Source = flowers;
-            Flower03Image.Source = flowers;
-            Flower04Image.Source = flowers;
-            Flower05Image.Source = flowers;
-            Flower06Image.Source = flowers;
-            Flower07Image.Source = flowers;
+            Flower01Image.Source = LoadImage("Flowers/flower_01.png");
+            Flower02Image.Source = LoadImage("Flowers/flower_02.png");
+            Flower03Image.Source = LoadImage("Flowers/flower_03.png");
+            Flower04Image.Source = LoadImage("Flowers/flower_04.png");
+            Flower05Image.Source = LoadImage("Flowers/flower_05.png");
+            Flower06Image.Source = LoadImage("Flowers/flower_06.png");
+            Flower07Image.Source = LoadImage("Flowers/flower_07.png");
             return true;
         }
         catch (Exception exception) when (

@@ -6,7 +6,7 @@ using EvanJoDesktopPet.Windows.Core.Characters;
 namespace EvanJoDesktopPet.Windows.Characters.EvanJo.Views;
 
 /// <summary>
-/// Hosts Evan Jo's selected static pose without owning desktop-window behavior.
+/// Hosts Evan Jo's layered poses and static fallback without owning window behavior.
 /// </summary>
 public partial class EvanJoPoseView : UserControl
 {
@@ -51,6 +51,12 @@ public partial class EvanJoPoseView : UserControl
 
     private void UpdateRenderedPose()
     {
+        if (StaticRenderer is null) return;
+        IdleAnimationView.Stop();
+        HappyAnimationView.Stop();
+        (ExpressionHost.Content as EvanJoExpressionAnimationView)?.Stop();
+        ExpressionHost.Content = null;
+
         var shouldUseLayeredIdle = CharacterDefinition is EvanJoCharacterDefinition
             && Pose == PetPoseId.Idle
             && IdleAnimationView.IsLayerSetAvailable;
@@ -58,7 +64,15 @@ public partial class EvanJoPoseView : UserControl
             && Pose == PetPoseId.Happy
             && HappyAnimationView.IsLayerSetAvailable;
 
-        StaticRenderer.Visibility = shouldUseLayeredIdle || shouldUseLayeredHappy
+        var expression = CharacterDefinition is EvanJoCharacterDefinition
+            && (Pose == PetPoseId.Loading || Pose == PetPoseId.Thinking || Pose == PetPoseId.Sleepy)
+            ? new EvanJoExpressionAnimationView(Pose)
+            : null;
+        var shouldUseExpression = expression?.IsLayerSetAvailable == true;
+        if (shouldUseExpression) ExpressionHost.Content = expression;
+        ExpressionHost.Visibility = shouldUseExpression ? Visibility.Visible : Visibility.Collapsed;
+
+        StaticRenderer.Visibility = shouldUseLayeredIdle || shouldUseLayeredHappy || shouldUseExpression
             ? Visibility.Collapsed
             : Visibility.Visible;
         IdleAnimationView.Visibility = shouldUseLayeredIdle
@@ -86,4 +100,6 @@ public partial class EvanJoPoseView : UserControl
             HappyAnimationView.Stop();
         }
     }
+
+    public void RestartAnimation() => UpdateRenderedPose();
 }

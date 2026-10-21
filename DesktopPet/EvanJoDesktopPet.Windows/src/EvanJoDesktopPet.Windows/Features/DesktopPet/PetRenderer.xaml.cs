@@ -53,6 +53,12 @@ public partial class PetRenderer : UserControl
 
     private void RenderPose()
     {
+        var presentation = CharacterDefinition is not null
+            && CharacterDefinition.PosePresentations.TryGetValue(Pose, out var configuredPresentation)
+            ? configuredPresentation
+            : PetPosePresentation.Default;
+        ApplyPresentation(presentation);
+
         if (CharacterDefinition is null)
         {
             PoseImage.Source = null;
@@ -61,6 +67,19 @@ public partial class PetRenderer : UserControl
 
         PoseImage.Source = LoadPose(CharacterDefinition, Pose)
             ?? LoadPose(CharacterDefinition, CharacterDefinition.FallbackPose);
+    }
+
+    private void ApplyPresentation(PetPosePresentation presentation)
+    {
+        Width = presentation.Width;
+        Height = presentation.Height;
+        HorizontalAlignment = HorizontalAlignment.Center;
+        VerticalAlignment = presentation.Alignment == PetPoseAlignment.Bottom
+            ? VerticalAlignment.Bottom
+            : VerticalAlignment.Center;
+        PoseImage.Margin = new Thickness(presentation.HorizontalInset, 0, presentation.HorizontalInset, 0);
+        PresentationScaleTransform.ScaleX = presentation.Scale;
+        PresentationScaleTransform.ScaleY = presentation.Scale;
     }
 
     private static ImageSource? LoadPose(

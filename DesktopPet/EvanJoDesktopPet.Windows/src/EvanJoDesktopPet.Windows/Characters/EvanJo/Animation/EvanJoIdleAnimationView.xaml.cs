@@ -13,6 +13,7 @@ namespace EvanJoDesktopPet.Windows.Characters.EvanJo.Animation;
 public partial class EvanJoIdleAnimationView : UserControl
 {
     private readonly EvanJoIdleAnimationController animationController;
+    private bool isAnimationRequested;
 
     public EvanJoIdleAnimationView()
     {
@@ -47,8 +48,9 @@ public partial class EvanJoIdleAnimationView : UserControl
                 SparkleDotTranslateTransform
             ]);
 
-        Loaded += (_, _) => Start();
-        Unloaded += (_, _) => Stop();
+        Loaded += (_, _) => StartIfVisible();
+        Unloaded += (_, _) => SuspendAnimation();
+        IsVisibleChanged += (_, _) => { if (IsVisible) StartIfVisible(); else SuspendAnimation(); };
         HeadPetInteraction.PettingDetected += OnHeadPettingDetected;
     }
 
@@ -56,7 +58,13 @@ public partial class EvanJoIdleAnimationView : UserControl
 
     public void Start()
     {
-        if (!IsLayerSetAvailable)
+        isAnimationRequested = true;
+        StartIfVisible();
+    }
+
+    private void StartIfVisible()
+    {
+        if (!isAnimationRequested || !IsLoaded || !IsVisible || !IsLayerSetAvailable)
         {
             return;
         }
@@ -66,6 +74,12 @@ public partial class EvanJoIdleAnimationView : UserControl
     }
 
     public void Stop()
+    {
+        isAnimationRequested = false;
+        SuspendAnimation();
+    }
+
+    private void SuspendAnimation()
     {
         HeadPetInteraction.StopInteraction();
         animationController.Stop();

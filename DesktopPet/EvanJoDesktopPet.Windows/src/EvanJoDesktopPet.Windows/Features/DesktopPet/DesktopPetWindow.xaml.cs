@@ -161,8 +161,11 @@ public partial class DesktopPetWindow : TransparentPetWindow
             return;
         }
 
+        var samePose = ReferenceEquals(PoseView.CharacterDefinition, behaviorState.Character)
+            && PoseView.Pose == behaviorState.CurrentPose;
         PoseView.CharacterDefinition = behaviorState.Character;
         PoseView.Pose = behaviorState.CurrentPose;
+        if (samePose) PoseView.RestartAnimation();
         UpdateMenuState(behaviorState);
     }
 

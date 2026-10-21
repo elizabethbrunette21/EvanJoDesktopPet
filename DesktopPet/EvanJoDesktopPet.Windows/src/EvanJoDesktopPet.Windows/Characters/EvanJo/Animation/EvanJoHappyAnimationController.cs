@@ -157,6 +157,7 @@ public sealed class EvanJoHappyAnimationController
         {
             if (ReferenceEquals(animationStoryboard, storyboard))
             {
+                storyboard.Remove(animationHost);
                 animationStoryboard = null;
                 ResetVisualState();
             }
