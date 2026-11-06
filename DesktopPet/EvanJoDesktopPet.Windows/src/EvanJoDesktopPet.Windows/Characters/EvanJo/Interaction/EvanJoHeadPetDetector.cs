@@ -10,7 +10,6 @@ public sealed class EvanJoHeadPetDetector
     private const double MinimumMovement = 2;
     private const double MinimumLegDistance = 7;
     private const double MinimumTotalDistance = 20;
-    private static readonly TimeSpan MinimumDuration = TimeSpan.FromSeconds(0.25);
     private static readonly TimeSpan MaximumDuration = TimeSpan.FromSeconds(1.35);
     private static readonly TimeSpan CooldownDuration = TimeSpan.FromSeconds(1.2);
 
@@ -19,7 +18,6 @@ public sealed class EvanJoHeadPetDetector
     private DateTimeOffset? startedAt;
     private DateTimeOffset cooldownUntil;
     private double? previousX;
-    private double? previousY;
     private double? legStartX;
     private int direction;
     private int reversals;
@@ -45,29 +43,22 @@ public sealed class EvanJoHeadPetDetector
             return;
         }
 
-        if (startedAt is null || previousX is null || previousY is null || legStartX is null)
+        if (startedAt is null || previousX is null || legStartX is null)
         {
-            Begin(x, y, timestamp);
+            Begin(x, timestamp);
             return;
         }
 
         var elapsed = timestamp - startedAt.Value;
         if (elapsed > MaximumDuration)
         {
-            Begin(x, y, timestamp);
+            Begin(x, timestamp);
             return;
         }
 
         var deltaX = x - previousX.Value;
-        var deltaY = y - previousY.Value;
         if (Math.Abs(deltaX) < MinimumMovement)
         {
-            return;
-        }
-
-        if (Math.Abs(deltaX) < Math.Abs(deltaY))
-        {
-            Begin(x, y, timestamp);
             return;
         }
 
@@ -87,11 +78,9 @@ public sealed class EvanJoHeadPetDetector
         }
 
         previousX = x;
-        previousY = y;
 
         if (reversals < 2
-            || totalDistance < MinimumTotalDistance
-            || elapsed < MinimumDuration)
+            || totalDistance < MinimumTotalDistance)
         {
             return;
         }
@@ -105,7 +94,6 @@ public sealed class EvanJoHeadPetDetector
     {
         startedAt = null;
         previousX = null;
-        previousY = null;
         legStartX = null;
         direction = 0;
         reversals = 0;
@@ -115,11 +103,10 @@ public sealed class EvanJoHeadPetDetector
     private bool IsInsideHead(double x, double y) =>
         x >= 0 && x <= headWidth && y >= 0 && y <= headHeight;
 
-    private void Begin(double x, double y, DateTimeOffset timestamp)
+    private void Begin(double x, DateTimeOffset timestamp)
     {
         startedAt = timestamp;
         previousX = x;
-        previousY = y;
         legStartX = x;
         direction = 0;
         reversals = 0;

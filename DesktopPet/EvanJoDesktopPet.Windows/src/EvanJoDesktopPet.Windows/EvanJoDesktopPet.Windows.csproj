@@ -8,6 +8,7 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <RootNamespace>EvanJoDesktopPet.Windows</RootNamespace>
     <AssemblyName>EvanJoDesktopPet.Windows</AssemblyName>
+    <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

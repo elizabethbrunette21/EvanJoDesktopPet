@@ -2,7 +2,7 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-EvanJoDesktopPet is a small, native macOS desktop companion built in Swift with SwiftUI and AppKit. It renders a transparent, non-activating floating pet window and keeps all behavior and state local to the Mac.
+EvanJoDesktopPet is a local desktop companion for macOS and Windows. The macOS app is built with SwiftUI and AppKit; the Windows app is built with .NET 8 and WPF.
 
 EvanJoDesktopPet is a released macOS desktop pet application. Evan Jo is the first bundled character, while the window and behavior engine are structured so future characters can reuse the same application.
 
@@ -23,10 +23,15 @@ brew install --cask elizabethbrunette21/tap/evan-jo-desktop-pet
 - Signed with Apple Developer ID
 - Notarized by Apple
 
+### Windows x64 preview
+
+[Download the Windows ZIP](https://github.com/elizabethbrunette21/EvanJoDesktopPet/releases/download/windows-v0.1.0-preview.2/EvanJoDesktopPet-Windows-x64.zip). Extract it and double-click `Install.cmd` to install the self-contained app, create an **Evan Jo Desktop Pet** desktop shortcut, and open it. Requires Windows 10 or later; no separate .NET installation or administrator access is needed. Quit the pet before updating. This preview is unsigned, so Windows may show a publisher warning.
+
+[Windows build and installation details](DesktopPet/EvanJoDesktopPet.Windows/README.md)
+
 [View all releases](https://github.com/elizabethbrunette21/EvanJoDesktopPet/releases)
 
-
-## Features
+## macOS features
 
 - Transparent, borderless floating window that does not take keyboard focus
 - Dragging, visible-screen clamping, and saved position restoration
@@ -35,7 +40,7 @@ brew install --cask elizabethbrunette21/tap/evan-jo-desktop-pet
 - Automatic pose scheduling with cancellation-safe state transitions
 - No backend, account, analytics, network service, or third-party dependency
 
-## Requirements
+## Build requirements (macOS)
 
 - macOS 11 or later
 - Xcode with the macOS SDK
@@ -61,6 +66,7 @@ xcodebuild \
 DesktopPet/
   EvanJoDesktopPet/           App source and runtime assets
   EvanJoDesktopPet.xcodeproj/ Xcode project
+  EvanJoDesktopPet.Windows/   Windows app and packaging scripts
   docs/                       Architecture and asset documentation
 ```
 

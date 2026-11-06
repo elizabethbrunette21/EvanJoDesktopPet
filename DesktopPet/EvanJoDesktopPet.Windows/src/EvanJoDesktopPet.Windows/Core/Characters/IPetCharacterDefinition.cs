@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using EvanJoDesktopPet.Windows.Core.Behavior;
 
 namespace EvanJoDesktopPet.Windows.Core.Characters;
 
@@ -21,6 +22,10 @@ public interface IPetCharacterDefinition
     IReadOnlyDictionary<PetPoseId, Uri> PoseAssets { get; }
 
     IReadOnlyDictionary<PetPoseId, PetPosePresentation> PosePresentations { get; }
+
+    PetAutomaticPoseConfiguration? AutomaticPoseConfiguration { get; }
+
+    PetTemporaryPose? ClickReactionFor(PetPoseId pose);
 
     string GetPoseDisplayName(PetPoseId pose);
 }

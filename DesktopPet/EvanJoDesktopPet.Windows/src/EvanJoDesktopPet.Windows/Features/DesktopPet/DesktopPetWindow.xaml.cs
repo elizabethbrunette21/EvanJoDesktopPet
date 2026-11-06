@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -15,13 +16,17 @@ public partial class DesktopPetWindow : TransparentPetWindow
 {
     private const double DesktopMargin = 24;
     private const double ClickMovementThreshold = 6;
-    private static readonly TimeSpan HappyReactionDuration = TimeSpan.FromSeconds(1.8);
+    protected override double LeftEdgeAllowance => 40;
+    protected override double TopEdgeAllowance => 24;
+    protected override double RightEdgeAllowance => 48;
     private readonly PetBehaviorController behaviorController;
     private readonly ContextMenu contextMenu;
     private readonly Dictionary<PetPoseId, MenuItem> poseMenuItems = new();
     private MenuItem? automaticModeMenuItem;
     private MenuItem? fixedModeMenuItem;
     private bool hasPlacedInitialWindow;
+    private Point? mouseDownPosition;
+    private bool isDragging;
 
     public DesktopPetWindow()
     {
@@ -45,6 +50,7 @@ public partial class DesktopPetWindow : TransparentPetWindow
 
         hasPlacedInitialWindow = true;
         MoveToInitialPosition();
+        behaviorController.SetAutomatic();
     }
 
     private void PetSurface_OnMouseLeftButtonDown(
@@ -56,15 +62,44 @@ public partial class DesktopPetWindow : TransparentPetWindow
             return;
         }
 
-        var mouseDownPosition = PointToScreen(e.GetPosition(this));
-        DragMove();
+        mouseDownPosition = PointToScreen(e.GetPosition(this));
+        PetSurface.CaptureMouse();
+        e.Handled = true;
+    }
 
-        var mouseUpPosition = PointToScreen(Mouse.GetPosition(this));
-        if (IsClick(mouseDownPosition, mouseUpPosition))
+    private void PetSurface_OnMouseMove(object sender, MouseEventArgs e)
+    {
+        if (mouseDownPosition is not { } start || isDragging
+            || e.LeftButton != MouseButtonState.Pressed
+            || IsClick(start, PointToScreen(e.GetPosition(this)))) return;
+
+        isDragging = true;
+        PetSurface.ReleaseMouseCapture();
+        behaviorController.SuspendAutomatic();
+        try
         {
-            StartTemporaryHappyReaction();
+            DragMove();
+        }
+        catch (InvalidOperationException)
+        {
+            // The button may be released between the move event and DragMove.
+        }
+        finally
+        {
+            mouseDownPosition = null;
+            isDragging = false;
+            behaviorController.ResumeAutomatic();
         }
 
+        e.Handled = true;
+    }
+
+    private void PetSurface_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (mouseDownPosition is null || isDragging) return;
+        mouseDownPosition = null;
+        PetSurface.ReleaseMouseCapture();
+        behaviorController.ReactToClick();
         e.Handled = true;
     }
 
@@ -80,8 +115,12 @@ public partial class DesktopPetWindow : TransparentPetWindow
 
     private ContextMenu CreateContextMenu()
     {
-        var menu = new ContextMenu();
-        var poseMenu = new MenuItem { Header = "Pose" };
+        var isChinese = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "zh";
+        var menu = new ContextMenu { Style = (Style)FindResource("PetContextMenuStyle") };
+        menu.Resources.Add(typeof(MenuItem), FindResource("PetMenuItemStyle"));
+        menu.Resources.Add(typeof(Separator), FindResource("PetMenuSeparatorStyle"));
+        var sectionStyle = (Style)FindResource("PetMenuSectionStyle");
+        menu.Items.Add(new Separator { Tag = isChinese ? "状态" : "POSE", Style = sectionStyle });
         var character = behaviorController.State.Character;
 
         foreach (var pose in character.AvailablePoses)
@@ -92,38 +131,35 @@ public partial class DesktopPetWindow : TransparentPetWindow
                 IsCheckable = true
             };
             poseMenuItem.Click += (_, _) => SelectPose(pose);
-            poseMenu.Items.Add(poseMenuItem);
+            menu.Items.Add(poseMenuItem);
             poseMenuItems.Add(pose, poseMenuItem);
         }
 
-        menu.Items.Add(poseMenu);
         menu.Items.Add(new Separator());
-
-        var modeMenu = new MenuItem { Header = "Mode" };
+        menu.Items.Add(new Separator { Tag = isChinese ? "模式" : "MODE", Style = sectionStyle });
         automaticModeMenuItem = new MenuItem
         {
-            Header = "Automatic",
+            Header = isChinese ? "自动切换" : "Automatic",
             IsCheckable = true
         };
         automaticModeMenuItem.Click += (_, _) => behaviorController.SetAutomatic();
-        modeMenu.Items.Add(automaticModeMenuItem);
+        menu.Items.Add(automaticModeMenuItem);
 
         fixedModeMenuItem = new MenuItem
         {
-            Header = "Fixed",
+            Header = isChinese ? "固定状态" : "Fixed",
             IsCheckable = true
         };
         fixedModeMenuItem.Click += (_, _) => behaviorController.SetFixed();
-        modeMenu.Items.Add(fixedModeMenuItem);
-        menu.Items.Add(modeMenu);
+        menu.Items.Add(fixedModeMenuItem);
         menu.Items.Add(new Separator());
 
-        var resetPositionItem = new MenuItem { Header = "Reset Position" };
+        var resetPositionItem = new MenuItem { Header = isChinese ? "重置位置" : "Reset Position" };
         resetPositionItem.Click += (_, _) => MoveToInitialPosition();
         menu.Items.Add(resetPositionItem);
         menu.Items.Add(new Separator());
 
-        var quitItem = new MenuItem { Header = "Quit EvanJoDesktopPet" };
+        var quitItem = new MenuItem { Header = isChinese ? "退出" : "Quit" };
         quitItem.Click += (_, _) => Application.Current.Shutdown();
         menu.Items.Add(quitItem);
 
@@ -134,20 +170,6 @@ public partial class DesktopPetWindow : TransparentPetWindow
     private void SelectPose(PetPoseId pose)
     {
         behaviorController.SetPose(pose);
-    }
-
-    private async void StartTemporaryHappyReaction()
-    {
-        try
-        {
-            await behaviorController.ShowTemporaryPose(
-                PetPoseId.Happy,
-                HappyReactionDuration);
-        }
-        catch (ObjectDisposedException)
-        {
-            // Window shutdown can dispose the behavior controller after a click.
-        }
     }
 
     private static bool IsClick(Point mouseDownPosition, Point mouseUpPosition) =>
@@ -173,7 +195,8 @@ public partial class DesktopPetWindow : TransparentPetWindow
     {
         foreach (var (pose, menuItem) in poseMenuItems)
         {
-            menuItem.IsChecked = pose == behaviorState.CurrentPose;
+            menuItem.IsChecked = behaviorState.Mode == PetBehaviorMode.Fixed
+                && pose == behaviorController.FixedPose;
         }
 
         if (automaticModeMenuItem is not null)
@@ -204,9 +227,10 @@ public partial class DesktopPetWindow : TransparentPetWindow
 
         Left = Math.Max(
             workingArea.Left,
-            workingArea.Right - windowWidth - DesktopMargin);
+            workingArea.Right - windowWidth + RightEdgeAllowance);
         Top = Math.Max(
             workingArea.Top,
             workingArea.Bottom - windowHeight - DesktopMargin);
     }
+
 }

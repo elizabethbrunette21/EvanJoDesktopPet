@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,189 +8,259 @@ using EvanJoDesktopPet.Windows.Core.Characters;
 namespace EvanJoDesktopPet.Windows.Core.Behavior;
 
 /// <summary>
-/// Owns display intent without depending on rendering, assets, or UI controls.
+/// Owns the selected pose and its cancellable automatic cycle.
+/// Called on the window's UI thread so delayed continuations publish in order.
 /// </summary>
 public sealed class PetBehaviorController : IDisposable
 {
-    private readonly object syncRoot = new();
-    private CancellationTokenSource? temporaryPoseCancellation;
-    private PetBehaviorState state;
+    private CancellationTokenSource? cycleCancellation;
+    private readonly Dictionary<PetPoseId, int> remainingCooldowns = new();
+    private PetPoseId? lastExpressivePose;
+    private PetPoseId fixedPose;
+    private bool isLoadingOverrideActive;
     private bool isDisposed;
 
     public PetBehaviorController(IPetCharacterDefinition character)
     {
         ArgumentNullException.ThrowIfNull(character);
-
-        state = new PetBehaviorState(
-            character,
-            ResolvePose(character, character.DefaultPose),
-            PetBehaviorMode.Automatic);
+        fixedPose = ResolvePose(character, character.DefaultPose);
+        State = new PetBehaviorState(character, fixedPose, PetBehaviorMode.Automatic);
     }
 
     public event Action<PetBehaviorState>? StateChanged;
 
-    public PetBehaviorState State
-    {
-        get
-        {
-            lock (syncRoot)
-            {
-                return state;
-            }
-        }
-    }
+    public PetBehaviorState State { get; private set; }
+
+    public PetPoseId FixedPose => fixedPose;
 
     public void SetPose(PetPoseId pose)
     {
-        Publish(UpdateState(
-            mode: PetBehaviorMode.Fixed,
-            pose: pose,
-            cancelTemporaryPose: true));
+        ThrowIfDisposed();
+        CancelCycle();
+        fixedPose = ResolvePose(State.Character, pose);
+        SetState(isLoadingOverrideActive ? PetPoseId.Loading : fixedPose, PetBehaviorMode.Fixed);
     }
 
     public void SetFixed()
     {
-        Publish(UpdateState(
-            mode: PetBehaviorMode.Fixed,
-            pose: State.CurrentPose,
-            cancelTemporaryPose: true));
+        ThrowIfDisposed();
+        CancelCycle();
+        if (!isLoadingOverrideActive) fixedPose = State.CurrentPose;
+        SetState(isLoadingOverrideActive ? PetPoseId.Loading : fixedPose, PetBehaviorMode.Fixed);
     }
 
     public void SetAutomatic()
     {
-        var currentState = State;
-        Publish(UpdateState(
-            mode: PetBehaviorMode.Automatic,
-            pose: currentState.Character.DefaultPose,
-            cancelTemporaryPose: true));
+        ThrowIfDisposed();
+        CancelCycle();
+        lastExpressivePose = null;
+        remainingCooldowns.Clear();
+        if (isLoadingOverrideActive)
+        {
+            SetState(PetPoseId.Loading, PetBehaviorMode.Automatic);
+            return;
+        }
+
+        SetState(State.Character.DefaultPose, PetBehaviorMode.Automatic);
+        StartCycle(State.Character.AutomaticPoseConfiguration, initial: true);
     }
 
-    /// <summary>
-    /// Shows one caller-requested pose for the supplied duration, then restores
-    /// the definition's default pose. This does not schedule future behavior.
-    /// </summary>
-    public async Task ShowTemporaryPose(
-        PetPoseId pose,
-        TimeSpan duration,
-        CancellationToken cancellationToken = default)
+    public void ReactToClick()
     {
-        if (duration < TimeSpan.Zero)
+        ThrowIfDisposed();
+        if (isLoadingOverrideActive) return;
+        var reaction = State.Character.ClickReactionFor(State.CurrentPose);
+        if (reaction is null) return;
+
+        CancelCycle();
+        SetState(reaction.Pose, State.Mode);
+        if (State.Mode == PetBehaviorMode.Automatic)
+            StartCycle(State.Character.AutomaticPoseConfiguration, initial: false, interactionDuration: reaction.Duration);
+        else
         {
-            throw new ArgumentOutOfRangeException(nameof(duration));
+            var cancellation = new CancellationTokenSource();
+            cycleCancellation = cancellation;
+            _ = RestoreFixedPoseAsync(reaction.Duration, cancellation);
         }
+    }
 
-        var linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
-            cancellationToken);
-        PetBehaviorState temporaryState;
+    public void SuspendAutomatic()
+    {
+        ThrowIfDisposed();
+        if (State.Mode == PetBehaviorMode.Automatic) CancelCycle();
+    }
 
-        lock (syncRoot)
-        {
-            ThrowIfDisposed();
-            CancelTemporaryPoseNoLock();
-            temporaryPoseCancellation = linkedCancellation;
-            state = state with
-            {
-                CurrentPose = ResolvePose(state.Character, pose)
-            };
-            temporaryState = state;
-        }
+    public void ResumeAutomatic()
+    {
+        ThrowIfDisposed();
+        if (State.Mode == PetBehaviorMode.Automatic && !isLoadingOverrideActive)
+            StartAutomaticCycle(resetHistory: false);
+    }
 
-        Publish(temporaryState);
-
-        try
-        {
-            await Task.Delay(duration, linkedCancellation.Token);
-        }
-        catch (OperationCanceledException) when (linkedCancellation.IsCancellationRequested)
-        {
-            // Cancellation follows the same default-pose restoration path.
-        }
-        finally
-        {
-            PetBehaviorState? restoredState = null;
-
-            lock (syncRoot)
-            {
-                if (ReferenceEquals(temporaryPoseCancellation, linkedCancellation))
-                {
-                    temporaryPoseCancellation = null;
-                    state = state with
-                    {
-                        CurrentPose = ResolvePose(
-                            state.Character,
-                            state.Character.DefaultPose)
-                    };
-                    restoredState = state;
-                }
-            }
-
-            linkedCancellation.Dispose();
-
-            if (restoredState is not null)
-            {
-                Publish(restoredState);
-            }
-        }
+    public void SetLoadingOverrideActive(bool active)
+    {
+        ThrowIfDisposed();
+        if (active == isLoadingOverrideActive) return;
+        isLoadingOverrideActive = active;
+        CancelCycle();
+        if (active)
+            SetState(PetPoseId.Loading, State.Mode);
+        else if (State.Mode == PetBehaviorMode.Automatic)
+            StartAutomaticCycle(resetHistory: false);
+        else
+            SetState(fixedPose, PetBehaviorMode.Fixed);
     }
 
     public void Dispose()
     {
-        lock (syncRoot)
+        if (isDisposed) return;
+        isDisposed = true;
+        CancelCycle();
+    }
+
+    private void StartAutomaticCycle(bool resetHistory)
+    {
+        CancelCycle();
+        if (resetHistory)
         {
-            if (isDisposed)
+            lastExpressivePose = null;
+            remainingCooldowns.Clear();
+        }
+        if (State.Mode != PetBehaviorMode.Automatic || isLoadingOverrideActive) return;
+        SetState(State.Character.DefaultPose, PetBehaviorMode.Automatic);
+        StartCycle(State.Character.AutomaticPoseConfiguration, initial: true);
+    }
+
+    private void StartCycle(
+        PetAutomaticPoseConfiguration? configuration,
+        bool initial,
+        TimeSpan? interactionDuration = null)
+    {
+        if (configuration is null) return;
+        var cancellation = new CancellationTokenSource();
+        cycleCancellation = cancellation;
+        _ = RunCycleAsync(configuration, initial, interactionDuration, cancellation);
+    }
+
+    private async Task RunCycleAsync(
+        PetAutomaticPoseConfiguration configuration,
+        bool initial,
+        TimeSpan? interactionDuration,
+        CancellationTokenSource cancellation)
+    {
+        try
+        {
+            if (interactionDuration is { } duration)
             {
-                return;
+                await Task.Delay(duration, cancellation.Token);
+                if (!IsCycleActive(cancellation)) return;
+                SetState(State.Character.DefaultPose, PetBehaviorMode.Automatic);
             }
 
-            isDisposed = true;
-            CancelTemporaryPoseNoLock();
+            while (IsCycleActive(cancellation))
+            {
+                var minimum = initial ? configuration.InitialIdleMinimum : configuration.RecoveryIdleMinimum;
+                var maximum = initial ? configuration.InitialIdleMaximum : configuration.RecoveryIdleMaximum;
+                await Task.Delay(RandomDelay(minimum, maximum), cancellation.Token);
+                if (!IsCycleActive(cancellation)) return;
+
+                var selected = SelectAutomaticPose(configuration);
+                if (selected is null) return;
+                RecordSelection(selected.Pose, configuration);
+                SetState(selected.Pose, PetBehaviorMode.Automatic);
+                await Task.Delay(selected.Duration, cancellation.Token);
+                if (!IsCycleActive(cancellation)) return;
+                SetState(State.Character.DefaultPose, PetBehaviorMode.Automatic);
+                initial = false;
+            }
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            if (ReferenceEquals(cycleCancellation, cancellation)) cycleCancellation = null;
+            cancellation.Dispose();
         }
     }
 
-    private PetBehaviorState UpdateState(
-        PetBehaviorMode mode,
-        PetPoseId pose,
-        bool cancelTemporaryPose)
+    private async Task RestoreFixedPoseAsync(TimeSpan duration, CancellationTokenSource cancellation)
     {
-        lock (syncRoot)
+        try
         {
-            ThrowIfDisposed();
-
-            if (cancelTemporaryPose)
-            {
-                CancelTemporaryPoseNoLock();
-            }
-
-            state = state with
-            {
-                CurrentPose = ResolvePose(state.Character, pose),
-                Mode = mode
-            };
-            return state;
+            await Task.Delay(duration, cancellation.Token);
+            if (ReferenceEquals(cycleCancellation, cancellation) && !isDisposed
+                && State.Mode == PetBehaviorMode.Fixed && !isLoadingOverrideActive)
+                SetState(fixedPose, PetBehaviorMode.Fixed);
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
+        }
+        finally
+        {
+            if (ReferenceEquals(cycleCancellation, cancellation)) cycleCancellation = null;
+            cancellation.Dispose();
         }
     }
 
-    private void CancelTemporaryPoseNoLock()
+    private PetTemporaryPose? SelectAutomaticPose(PetAutomaticPoseConfiguration configuration)
     {
-        temporaryPoseCancellation?.Cancel();
-        temporaryPoseCancellation = null;
+        var totalWeight = 0;
+        foreach (var candidate in configuration.WeightedPoses)
+            if (candidate.Weight > 0 && candidate.TemporaryPose.Pose != lastExpressivePose
+                && !remainingCooldowns.ContainsKey(candidate.TemporaryPose.Pose))
+                totalWeight += candidate.Weight;
+
+        if (totalWeight == 0) return null;
+        var target = Random.Shared.Next(totalWeight);
+        foreach (var candidate in configuration.WeightedPoses)
+        {
+            if (candidate.Weight <= 0 || candidate.TemporaryPose.Pose == lastExpressivePose
+                || remainingCooldowns.ContainsKey(candidate.TemporaryPose.Pose)) continue;
+            target -= candidate.Weight;
+            if (target < 0) return candidate.TemporaryPose;
+        }
+        return null;
     }
 
-    private static PetPoseId ResolvePose(
-        IPetCharacterDefinition character,
-        PetPoseId requestedPose) =>
-        character.AvailablePoses.Contains(requestedPose)
-            ? requestedPose
-            : character.FallbackPose;
+    private void RecordSelection(PetPoseId pose, PetAutomaticPoseConfiguration configuration)
+    {
+        foreach (var cooldownPose in new List<PetPoseId>(remainingCooldowns.Keys))
+        {
+            var remaining = remainingCooldowns[cooldownPose] - 1;
+            if (remaining <= 0) remainingCooldowns.Remove(cooldownPose);
+            else remainingCooldowns[cooldownPose] = remaining;
+        }
+        if (configuration.CooldownSelections.TryGetValue(pose, out var cooldown) && cooldown > 0)
+            remainingCooldowns[pose] = cooldown;
+        lastExpressivePose = pose;
+    }
 
-    private void Publish(PetBehaviorState updatedState) =>
-        StateChanged?.Invoke(updatedState);
+    private static TimeSpan RandomDelay(TimeSpan minimum, TimeSpan maximum) =>
+        minimum + TimeSpan.FromTicks((long)((maximum - minimum).Ticks * Random.Shared.NextDouble()));
+
+    private bool IsCycleActive(CancellationTokenSource cancellation) =>
+        !isDisposed && ReferenceEquals(cycleCancellation, cancellation)
+        && !cancellation.IsCancellationRequested && !isLoadingOverrideActive
+        && State.Mode == PetBehaviorMode.Automatic;
+
+    private void CancelCycle()
+    {
+        cycleCancellation?.Cancel();
+        cycleCancellation = null;
+    }
+
+    private void SetState(PetPoseId pose, PetBehaviorMode mode)
+    {
+        State = State with { CurrentPose = ResolvePose(State.Character, pose), Mode = mode };
+        StateChanged?.Invoke(State);
+    }
+
+    private static PetPoseId ResolvePose(IPetCharacterDefinition character, PetPoseId pose) =>
+        character.AvailablePoses.Contains(pose) ? pose : character.FallbackPose;
 
     private void ThrowIfDisposed()
     {
-        if (isDisposed)
-        {
-            throw new ObjectDisposedException(nameof(PetBehaviorController));
-        }
+        if (isDisposed) throw new ObjectDisposedException(nameof(PetBehaviorController));
     }
 }

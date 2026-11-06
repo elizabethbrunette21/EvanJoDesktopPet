@@ -45,19 +45,58 @@ assert abs(measurements[0][0] - measurements[1][0]) < 0.6, measurements
 assert all(abs(bottom - 176) < 0.2 for _, bottom in measurements), measurements
 
 controller = (ANIMATION / 'EvanJoHappyAnimationController.cs').read_text()
+view_code = (ANIMATION / 'EvanJoHappyAnimationView.xaml.cs').read_text()
 def offsets(name):
     block = controller.split(name + ' =', 1)[1].split('};', 1)[0]
     return [(float(x), float(y)) for x, y in re.findall(r'new\((-?[\d.]+), (-?[\d.]+)\)', block)]
 midpoints, endpoints = offsets('FlowerMidpointOffsets'), offsets('FlowerFinalOffsets')
 assert len(midpoints) == len(endpoints) == 7
+assert 'FlowerSizeScale = 1.8' in controller
+assert 'Flowers/evan_jo_happy_flowers.png' in view_code
+assert 'Flowers/flower_01.png' not in view_code
+mask_rects = [(20.28, 24.96, 20.28, 20.28), (107.64, 18.72, 24.96, 23.4),
+              (121.68, 45.24, 14.04, 15.6), (127.92, 74.88, 24.96, 26.52),
+              (123.24, 107.64, 18.72, 18.72), (6.24, 81.12, 28.08, 28.08),
+              (10.92, 102.96, 18.72, 18.72)]
+anchors = [(0.195, 0.225), (0.77, 0.195), (0.825, 0.34), (0.90, 0.565),
+           (0.85, 0.75), (0.13, 0.61), (0.13, 0.72)]
+with Image.open(ASSETS / 'Happy/Animation/Flowers/evan_jo_happy_flowers.png') as atlas:
+    alpha = atlas.getchannel('A').point(lambda a: 255 if a > 16 else 0)
+    atlas_width, atlas_height = atlas.size
 for i in range(1, 8):
     element = happy_layers[f'Flower{i:02}Image']
-    left, top, right, bottom = bounds(element, ASSETS / f'Happy/Animation/Flowers/flower_{i:02}.png')
-    for dx, dy in [(0, 0), midpoints[i - 1], endpoints[i - 1]]:
-        assert 0 <= left + dx < right + dx <= width, (i, 'horizontal clipping')
-        assert 0 <= top + dy < bottom + dy <= height, (i, 'vertical clipping')
+    assert float(element.get('Width')) == float(element.get('Height')) == 156
+    assert (float(element.get('Canvas.Left')), float(element.get('Canvas.Top'))) == (42, 33.6986)
+    assert tuple(map(float, element.get('RenderTransformOrigin').split(','))) == anchors[i - 1]
+    clip = element.find('w:Image.Clip/w:RectangleGeometry', NS)
+    assert clip is not None
+    rect = tuple(map(float, clip.get('Rect').split(',')))
+    assert rect == mask_rects[i - 1]
+    crop = tuple(round(v * atlas_width / 156) for v in
+                 (rect[0], rect[1], rect[0] + rect[2], rect[1] + rect[3]))
+    local_box = alpha.crop(crop).getbbox()
+    assert local_box, (i, 'empty atlas mask')
+    box = (crop[0] + local_box[0], crop[1] + local_box[1],
+           crop[0] + local_box[2], crop[1] + local_box[3])
+    anchor_x = 42 + anchors[i - 1][0] * 156
+    anchor_y = 33.6986 + anchors[i - 1][1] * 156
+    for scale, dx, dy in [(0.72, 0, 0), (1.8, *midpoints[i - 1]),
+                          (1.8, *endpoints[i - 1])]:
+        left, right = (anchor_x + scale * (42 + x * 156 / atlas_width - anchor_x) + dx
+                       for x in (box[0], box[2]))
+        top, bottom = (anchor_y + scale * (33.6986 + y * 156 / atlas_height - anchor_y) + dy
+                       for y in (box[1], box[3]))
+        assert 0 <= left < right <= width, (i, 'horizontal clipping')
+        assert 0 <= top < bottom <= height, (i, 'vertical clipping')
     if i in (1, 2, 4, 6):
-        assert min(right - left, bottom - top) >= 22, (i, 'flower is too small')
+        assert min(right - left, bottom - top) >= 26, (i, 'flower is too small')
+
+line = happy_layers['JumpLinesImage']
+line_bounds = bounds(line, ASSETS / 'Happy/Animation/JumpLines/evan_jo_happy_jump_lines.png')
+assert 12 <= line_bounds[2] - line_bounds[0] <= 16, line_bounds
+assert 173 <= line_bounds[1] <= 176 and 180 <= line_bounds[3] <= 183, line_bounds
+scene = happy.find('w:Canvas', NS)
+assert scene is not None and list(scene)[-1] is line
 
 # Required layers must be independently decodable and present in the resource glob.
 for pose, names in {'Loading': ['Body', 'Text', 'Spinner'],
@@ -67,4 +106,4 @@ for pose, names in {'Loading': ['Body', 'Text', 'Spinner'],
         with Image.open(ASSETS / pose / 'Animation' / (name + '.png')) as image:
             assert image.mode == 'RGBA'
             image.verify()
-print(f'PASS: Idle/Happy heights and feet {measurements}; all 7 flower paths fit {width:g}x{height:g}; 16 new layers valid.')
+print(f'PASS: Happy atlas masks, flower paths, and jump-line placement {line_bounds}; Idle/Happy feet {measurements}; 16 expression layers valid.')

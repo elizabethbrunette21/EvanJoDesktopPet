@@ -96,13 +96,14 @@ public partial class EvanJoHappyAnimationView : UserControl
             HeadImage.Source = LoadImage("Head/evan_jo_happy_head.png");
             JumpLinesImage.Source = LoadImage("JumpLines/evan_jo_happy_jump_lines.png");
 
-            Flower01Image.Source = LoadImage("Flowers/flower_01.png");
-            Flower02Image.Source = LoadImage("Flowers/flower_02.png");
-            Flower03Image.Source = LoadImage("Flowers/flower_03.png");
-            Flower04Image.Source = LoadImage("Flowers/flower_04.png");
-            Flower05Image.Source = LoadImage("Flowers/flower_05.png");
-            Flower06Image.Source = LoadImage("Flowers/flower_06.png");
-            Flower07Image.Source = LoadImage("Flowers/flower_07.png");
+            var flowers = LoadImage("Flowers/evan_jo_happy_flowers.png");
+            Flower01Image.Source = flowers;
+            Flower02Image.Source = flowers;
+            Flower03Image.Source = flowers;
+            Flower04Image.Source = flowers;
+            Flower05Image.Source = flowers;
+            Flower06Image.Source = flowers;
+            Flower07Image.Source = flowers;
             return true;
         }
         catch (Exception exception) when (

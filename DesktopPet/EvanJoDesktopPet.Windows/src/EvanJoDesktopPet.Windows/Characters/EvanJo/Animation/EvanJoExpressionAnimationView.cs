@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -14,7 +15,11 @@ namespace EvanJoDesktopPet.Windows.Characters.EvanJo.Animation;
 internal sealed class EvanJoExpressionAnimationView : UserControl
 {
     private readonly Storyboard storyboard = new();
+    private readonly List<(Animatable Target, DependencyProperty Property, AnimationTimeline Timeline)> transformAnimations = new();
     private readonly bool reduceMotion = !SystemParameters.ClientAreaAnimation;
+    private TranslateTransform? loadingTextMove;
+    private TranslateTransform? loadingBodyMove;
+    private RotateTransform? loadingSpinnerRotation;
     private bool isStarted;
 
     internal EvanJoExpressionAnimationView(PetPoseId pose)
@@ -51,12 +56,34 @@ internal sealed class EvanJoExpressionAnimationView : UserControl
         if (isStarted || !IsLoaded || !IsVisible || !IsLayerSetAvailable) return;
         isStarted = true;
         storyboard.Begin(this, HandoffBehavior.SnapshotAndReplace, true);
+        foreach (var (target, property, timeline) in transformAnimations)
+            target.BeginAnimation(property, timeline);
+        if (loadingTextMove is not null && loadingBodyMove is not null && loadingSpinnerRotation is not null && !reduceMotion)
+        {
+            var pass = Frames((0, 159.14), (0.15, 159.14), (2.95, -180), (3.35, -180));
+            pass.RepeatBehavior = RepeatBehavior.Forever;
+            loadingTextMove.BeginAnimation(TranslateTransform.XProperty, pass);
+            loadingSpinnerRotation.BeginAnimation(RotateTransform.AngleProperty,
+                new DoubleAnimation(0, 360, TimeSpan.FromSeconds(2.8)) { RepeatBehavior = RepeatBehavior.Forever });
+            loadingBodyMove.BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation(0, -1, TimeSpan.FromSeconds(0.55))
+                {
+                    AutoReverse = true,
+                    RepeatBehavior = RepeatBehavior.Forever,
+                    EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
+                });
+        }
     }
 
     internal void Stop()
     {
         if (!isStarted) return;
         storyboard.Remove(this);
+        foreach (var (target, property, _) in transformAnimations)
+            target.BeginAnimation(property, null);
+        loadingTextMove?.BeginAnimation(TranslateTransform.XProperty, null);
+        loadingBodyMove?.BeginAnimation(TranslateTransform.YProperty, null);
+        loadingSpinnerRotation?.BeginAnimation(RotateTransform.AngleProperty, null);
         isStarted = false;
     }
 
@@ -66,31 +93,14 @@ internal sealed class EvanJoExpressionAnimationView : UserControl
         var textClip = new Canvas { Width = 176, Height = 132, ClipToBounds = true };
         scene.Children.Add(textClip);
         var text = Layer(textClip, "Loading", "Text", 180, 180, 88, 83);
-        var textMove = new TranslateTransform();
-        text.RenderTransform = textMove;
+        loadingTextMove = new TranslateTransform(159.14, 0);
+        text.RenderTransform = loadingTextMove;
         var body = Layer(scene, "Loading", "Body", 139, 139, 88, 73);
-        var bodyMove = new TranslateTransform();
-        body.RenderTransform = bodyMove;
+        loadingBodyMove = new TranslateTransform();
+        body.RenderTransform = loadingBodyMove;
         var spinner = Layer(scene, "Loading", "Spinner", 74, 74, 88, 38);
-        var rotation = new RotateTransform(0, 37, 37);
-        spinner.RenderTransform = rotation;
-
-        if (!reduceMotion)
-        {
-            var pass = Frames((0, 159.14), (0.15, 159.14), (2.95, -180), (3.35, -180));
-            pass.RepeatBehavior = RepeatBehavior.Forever;
-            Animate(textMove, TranslateTransform.XProperty, pass);
-            var spin = new DoubleAnimation(0, 360, TimeSpan.FromSeconds(2.8))
-                { RepeatBehavior = RepeatBehavior.Forever };
-            Animate(rotation, RotateTransform.AngleProperty, spin);
-            var bob = new DoubleAnimation(0, -1, TimeSpan.FromSeconds(0.55))
-            {
-                AutoReverse = true,
-                RepeatBehavior = RepeatBehavior.Forever,
-                EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
-            };
-            Animate(bodyMove, TranslateTransform.YProperty, bob);
-        }
+        loadingSpinnerRotation = new RotateTransform(0, 37, 37);
+        spinner.RenderTransform = loadingSpinnerRotation;
 
         Normalize(scene, new Rect(18.5 + 136.0 / 1254 * 139,
             3.5 + 24.0 / 1254 * 139, 969.0 / 1254 * 139, 1102.0 / 1254 * 139));
@@ -246,8 +256,13 @@ internal sealed class EvanJoExpressionAnimationView : UserControl
         Animate(scale, ScaleTransform.ScaleYProperty, Frames((0, from), (start, from), (start + duration, 1)));
     }
 
-    private void Animate(DependencyObject target, DependencyProperty property, Timeline timeline)
+    private void Animate(DependencyObject target, DependencyProperty property, AnimationTimeline timeline)
     {
+        if (target is Animatable animatable)
+        {
+            transformAnimations.Add((animatable, property, timeline));
+            return;
+        }
         Storyboard.SetTarget(timeline, target);
         Storyboard.SetTargetProperty(timeline, new PropertyPath(property));
         storyboard.Children.Add(timeline);

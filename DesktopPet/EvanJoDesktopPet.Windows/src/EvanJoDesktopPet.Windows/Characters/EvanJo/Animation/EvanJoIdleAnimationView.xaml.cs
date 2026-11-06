@@ -20,7 +20,6 @@ public partial class EvanJoIdleAnimationView : UserControl
         InitializeComponent();
         IsLayerSetAvailable = TryLoadLayerImages();
         animationController = new EvanJoIdleAnimationController(
-            this,
             HeadScaleTransform,
             HeadTranslateTransform,
             [

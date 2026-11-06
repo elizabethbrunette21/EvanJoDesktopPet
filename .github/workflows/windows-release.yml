@@ -1,0 +1,43 @@
+name: Windows Release
+
+on:
+  push:
+    tags:
+      - 'windows-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish Windows app
+        shell: pwsh
+        run: ./DesktopPet/EvanJoDesktopPet.Windows/scripts/Publish-Windows.ps1
+
+      - name: Publish GitHub Release asset
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $package = 'DesktopPet/EvanJoDesktopPet.Windows/dist/EvanJoDesktopPet-Windows-x64.zip'
+          $notes = 'DesktopPet/EvanJoDesktopPet.Windows/RELEASE_NOTES.md'
+          if (-not (Test-Path -LiteralPath $package)) { throw 'Windows package was not created.' }
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag $package --clobber
+          } else {
+            gh release create $tag $package --verify-tag --title 'Evan Jo Desktop Pet for Windows (Preview)' --notes-file $notes --prerelease
+          }
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub Release publish failed.' }

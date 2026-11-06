@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace EvanJoDesktopPet.Windows.Characters.EvanJo.Animation;
 
@@ -13,26 +14,25 @@ public sealed class EvanJoIdleAnimationController
 {
     private static readonly Vector[] SparkleOutwardOffsets =
     {
-        new(11, -4),
-        new(-6, -8),
-        new(-11, -4),
-        new(10, 9),
-        new(-10, 9),
-        new(-8, 3)
+        new(-22, 18),
+        new(53, -29),
+        new(16, -31),
+        new(-13, -74),
+        new(36, -94),
+        new(80, -41)
     };
 
-    private readonly FrameworkElement animationHost;
     private readonly ScaleTransform headScaleTransform;
     private readonly TranslateTransform headTranslateTransform;
     private readonly IReadOnlyList<FrameworkElement> sparkleElements;
     private readonly IReadOnlyList<ScaleTransform> sparkleScaleTransforms;
     private readonly IReadOnlyList<TranslateTransform> sparkleTranslateTransforms;
-    private Storyboard? nodStoryboard;
-    private Storyboard? sparkleStoryboard;
+    private readonly DispatcherTimer automaticNodTimer = new();
+    private readonly DispatcherTimer pettingNodTimer = new();
+    private readonly DispatcherTimer sparkleEndTimer = new();
     private bool isStarted;
 
     public EvanJoIdleAnimationController(
-        FrameworkElement animationHost,
         ScaleTransform headScaleTransform,
         TranslateTransform headTranslateTransform,
         IReadOnlyList<FrameworkElement> sparkleElements,
@@ -46,12 +46,28 @@ public sealed class EvanJoIdleAnimationController
             throw new ArgumentException("Every Evan Jo sparkle layer requires a transform.");
         }
 
-        this.animationHost = animationHost;
         this.headScaleTransform = headScaleTransform;
         this.headTranslateTransform = headTranslateTransform;
         this.sparkleElements = sparkleElements;
         this.sparkleScaleTransforms = sparkleScaleTransforms;
         this.sparkleTranslateTransforms = sparkleTranslateTransforms;
+        automaticNodTimer.Tick += (_, _) =>
+        {
+            automaticNodTimer.Interval = TimeSpan.FromSeconds(8);
+            PlayNod();
+        };
+        pettingNodTimer.Tick += (_, _) =>
+        {
+            pettingNodTimer.Stop();
+            ResetHead();
+            PlaySparkles();
+            ScheduleAutomaticNod(TimeSpan.FromSeconds(7.26));
+        };
+        sparkleEndTimer.Tick += (_, _) =>
+        {
+            sparkleEndTimer.Stop();
+            ResetSparkles();
+        };
     }
 
     public void Start()
@@ -63,14 +79,15 @@ public sealed class EvanJoIdleAnimationController
 
         isStarted = true;
         ResetVisualState();
-        PlayNod();
+        ScheduleAutomaticNod(TimeSpan.FromSeconds(2));
     }
 
     public void Stop()
     {
         isStarted = false;
-        StopStoryboard(ref nodStoryboard);
-        StopStoryboard(ref sparkleStoryboard);
+        automaticNodTimer.Stop();
+        pettingNodTimer.Stop();
+        sparkleEndTimer.Stop();
         ResetVisualState();
     }
 
@@ -81,23 +98,14 @@ public sealed class EvanJoIdleAnimationController
             return;
         }
 
-        StopStoryboard(ref nodStoryboard);
         ResetHead();
-
-        var storyboard = CreateNodStoryboard(
-            [(TimeSpan.FromSeconds(0.16), TimeSpan.FromSeconds(0.36))]);
-
-        storyboard.Completed += (_, _) =>
+        var nods = new[]
         {
-            if (ReferenceEquals(nodStoryboard, storyboard))
-            {
-                nodStoryboard = null;
-                ResetHead();
-            }
+            (TimeSpan.FromSeconds(0.16), TimeSpan.FromSeconds(0.36)),
+            (TimeSpan.FromSeconds(0.60), TimeSpan.FromSeconds(0.80))
         };
-
-        nodStoryboard = storyboard;
-        storyboard.Begin(animationHost, HandoffBehavior.SnapshotAndReplace, true);
+        headTranslateTransform.BeginAnimation(TranslateTransform.YProperty, CreateNodFrames(0, 1.5, nods));
+        headScaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, CreateNodFrames(1, 0.985, nods));
     }
 
     public void PlayPettingFeedback()
@@ -107,27 +115,13 @@ public sealed class EvanJoIdleAnimationController
             return;
         }
 
-        StopStoryboard(ref nodStoryboard);
-        StopStoryboard(ref sparkleStoryboard);
+        pettingNodTimer.Stop();
+        sparkleEndTimer.Stop();
+        automaticNodTimer.Stop();
         ResetVisualState();
-
-        var storyboard = CreateNodStoryboard(
-        [
-            (TimeSpan.FromSeconds(0.16), TimeSpan.FromSeconds(0.36)),
-            (TimeSpan.FromSeconds(0.60), TimeSpan.FromSeconds(0.80))
-        ]);
-        storyboard.Completed += (_, _) =>
-        {
-            if (ReferenceEquals(nodStoryboard, storyboard))
-            {
-                nodStoryboard = null;
-                ResetHead();
-                PlaySparkles();
-            }
-        };
-
-        nodStoryboard = storyboard;
-        storyboard.Begin(animationHost, HandoffBehavior.SnapshotAndReplace, true);
+        PlayNod();
+        pettingNodTimer.Interval = TimeSpan.FromSeconds(0.8);
+        pettingNodTimer.Start();
     }
 
     public void PlaySparkles()
@@ -137,78 +131,32 @@ public sealed class EvanJoIdleAnimationController
             return;
         }
 
-        StopStoryboard(ref sparkleStoryboard);
+        sparkleEndTimer.Stop();
         ResetSparkles();
 
-        var storyboard = new Storyboard { FillBehavior = FillBehavior.Stop };
-        var fadeStart = TimeSpan.FromSeconds(1.0);
-        var fadeEnd = TimeSpan.FromSeconds(1.22);
+        var fadeStart = TimeSpan.FromSeconds(1.15);
+        var fadeEnd = TimeSpan.FromSeconds(1.45);
 
         for (var index = 0; index < sparkleElements.Count; index++)
         {
             var appearanceStart = TimeSpan.FromSeconds(index * 0.08);
-            var appearanceEnd = appearanceStart + TimeSpan.FromSeconds(0.21);
+            var appearanceEnd = appearanceStart + TimeSpan.FromSeconds(0.42);
             var offset = SparkleOutwardOffsets[index];
 
-            AddSparkleTimeline(
-                storyboard,
-                sparkleElements[index],
-                UIElement.OpacityProperty,
-                CreateOpacityFrames(appearanceStart, appearanceEnd, fadeStart, fadeEnd));
-            AddSparkleTimeline(
-                storyboard,
-                sparkleScaleTransforms[index],
-                ScaleTransform.ScaleXProperty,
-                CreateMovementFrames(0.42, 1.18, appearanceStart, appearanceEnd, fadeEnd));
-            AddSparkleTimeline(
-                storyboard,
-                sparkleScaleTransforms[index],
-                ScaleTransform.ScaleYProperty,
-                CreateMovementFrames(0.42, 1.18, appearanceStart, appearanceEnd, fadeEnd));
-            AddSparkleTimeline(
-                storyboard,
-                sparkleTranslateTransforms[index],
-                TranslateTransform.XProperty,
+            sparkleElements[index].BeginAnimation(UIElement.OpacityProperty,
+                CreateOpacityFrames(appearanceStart, appearanceStart + TimeSpan.FromSeconds(0.12), fadeStart, fadeEnd));
+            sparkleScaleTransforms[index].BeginAnimation(ScaleTransform.ScaleXProperty,
+                CreateMovementFrames(0.1, 1.6, appearanceStart, appearanceEnd, fadeEnd));
+            sparkleScaleTransforms[index].BeginAnimation(ScaleTransform.ScaleYProperty,
+                CreateMovementFrames(0.1, 1.6, appearanceStart, appearanceEnd, fadeEnd));
+            sparkleTranslateTransforms[index].BeginAnimation(TranslateTransform.XProperty,
                 CreateMovementFrames(0, offset.X, appearanceStart, appearanceEnd, fadeEnd));
-            AddSparkleTimeline(
-                storyboard,
-                sparkleTranslateTransforms[index],
-                TranslateTransform.YProperty,
-                CreateMovementFrames(0, offset.Y, appearanceStart, appearanceEnd, fadeEnd));
+            sparkleTranslateTransforms[index].BeginAnimation(TranslateTransform.YProperty,
+                CreateMovementFrames(-43, offset.Y + 3, appearanceStart, appearanceEnd, fadeEnd));
         }
 
-        storyboard.Completed += (_, _) =>
-        {
-            if (ReferenceEquals(sparkleStoryboard, storyboard))
-            {
-                sparkleStoryboard = null;
-                ResetSparkles();
-            }
-        };
-
-        sparkleStoryboard = storyboard;
-        storyboard.Begin(animationHost, HandoffBehavior.SnapshotAndReplace, true);
-    }
-
-    private Storyboard CreateNodStoryboard(
-        IReadOnlyList<(TimeSpan Down, TimeSpan Recover)> nods)
-    {
-        var storyboard = new Storyboard { FillBehavior = FillBehavior.Stop };
-        var translationFrames = CreateNodFrames(0, 1.5, nods);
-        Storyboard.SetTarget(translationFrames, headTranslateTransform);
-        Storyboard.SetTargetProperty(
-            translationFrames,
-            new PropertyPath(TranslateTransform.YProperty));
-        storyboard.Children.Add(translationFrames);
-
-        var scaleFrames = CreateNodFrames(1, 0.985, nods);
-        Storyboard.SetTarget(scaleFrames, headScaleTransform);
-        Storyboard.SetTargetProperty(
-            scaleFrames,
-            new PropertyPath(ScaleTransform.ScaleYProperty));
-        storyboard.Children.Add(scaleFrames);
-
-        return storyboard;
+        sparkleEndTimer.Interval = fadeEnd;
+        sparkleEndTimer.Start();
     }
 
     private static DoubleAnimationUsingKeyFrames CreateNodFrames(
@@ -281,26 +229,11 @@ public sealed class EvanJoIdleAnimationController
         EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
     };
 
-    private static void AddSparkleTimeline(
-        Storyboard storyboard,
-        DependencyObject target,
-        DependencyProperty property,
-        Timeline timeline)
+    private void ScheduleAutomaticNod(TimeSpan delay)
     {
-        Storyboard.SetTarget(timeline, target);
-        Storyboard.SetTargetProperty(timeline, new PropertyPath(property));
-        storyboard.Children.Add(timeline);
-    }
-
-    private void StopStoryboard(ref Storyboard? storyboard)
-    {
-        if (storyboard is null)
-        {
-            return;
-        }
-
-        storyboard.Remove(animationHost);
-        storyboard = null;
+        automaticNodTimer.Stop();
+        automaticNodTimer.Interval = delay;
+        automaticNodTimer.Start();
     }
 
     private void ResetVisualState()
@@ -311,6 +244,8 @@ public sealed class EvanJoIdleAnimationController
 
     private void ResetHead()
     {
+        headScaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+        headTranslateTransform.BeginAnimation(TranslateTransform.YProperty, null);
         headScaleTransform.ScaleY = 1;
         headTranslateTransform.Y = 0;
     }
@@ -319,11 +254,16 @@ public sealed class EvanJoIdleAnimationController
     {
         for (var index = 0; index < sparkleElements.Count; index++)
         {
+            sparkleElements[index].BeginAnimation(UIElement.OpacityProperty, null);
+            sparkleScaleTransforms[index].BeginAnimation(ScaleTransform.ScaleXProperty, null);
+            sparkleScaleTransforms[index].BeginAnimation(ScaleTransform.ScaleYProperty, null);
+            sparkleTranslateTransforms[index].BeginAnimation(TranslateTransform.XProperty, null);
+            sparkleTranslateTransforms[index].BeginAnimation(TranslateTransform.YProperty, null);
             sparkleElements[index].Opacity = 0;
-            sparkleScaleTransforms[index].ScaleX = 0.42;
-            sparkleScaleTransforms[index].ScaleY = 0.42;
+            sparkleScaleTransforms[index].ScaleX = 0.1;
+            sparkleScaleTransforms[index].ScaleY = 0.1;
             sparkleTranslateTransforms[index].X = 0;
-            sparkleTranslateTransforms[index].Y = 0;
+            sparkleTranslateTransforms[index].Y = -43;
         }
     }
 }

@@ -2,7 +2,7 @@
 
 [English](README.md) | **简体中文**
 
-EvanJoDesktopPet 是一款使用 Swift、SwiftUI 和 AppKit 构建的小型原生 macOS 桌面宠物。它通过透明、不会激活应用的悬浮窗口显示宠物，并将所有行为和状态保存在本机。
+EvanJoDesktopPet 是一款在 macOS 和 Windows 上运行的本地桌面宠物。macOS 版使用 SwiftUI 和 AppKit 构建，Windows 版使用 .NET 8 和 WPF 构建。
 
 EvanJoDesktopPet 是一款已正式发布的 macOS 桌面宠物应用。Evan Jo 是首个内置角色，窗口与行为引擎采用可复用结构，方便未来角色继续使用同一套应用架构。
 
@@ -23,10 +23,15 @@ brew install --cask elizabethbrunette21/tap/evan-jo-desktop-pet
 - 使用 Apple Developer ID 签名
 - 已通过 Apple 公证
 
+### Windows x64 预览版
+
+[下载 Windows ZIP 安装包](https://github.com/elizabethbrunette21/EvanJoDesktopPet/releases/download/windows-v0.1.0-preview.2/EvanJoDesktopPet-Windows-x64.zip)。解压后双击 `Install.cmd`，即可安装完整应用、创建 **Evan Jo Desktop Pet** 桌面快捷方式并打开宠物。需要 Windows 10 或更高版本，无需单独安装 .NET，也无需管理员权限。更新前请先退出宠物。此预览版尚未签名，Windows 可能显示发布者警告。
+
+[Windows 构建和安装说明](DesktopPet/EvanJoDesktopPet.Windows/README.md)
+
 [查看全部版本](https://github.com/elizabethbrunette21/EvanJoDesktopPet/releases)
 
-
-## 功能特色
+## macOS 版功能
 
 - 不抢占键盘焦点的透明无边框悬浮窗口
 - 支持拖动、可见屏幕范围限制和位置保存与恢复
@@ -35,7 +40,7 @@ brew install --cask elizabethbrunette21/tap/evan-jo-desktop-pet
 - 使用支持安全取消和状态切换的自动姿势调度逻辑
 - 不依赖后端、账户、分析服务、网络服务或第三方依赖
 
-## 系统要求
+## 本地构建要求（macOS）
 
 - macOS 11 或更高版本
 - 带有 macOS SDK 的 Xcode
@@ -61,6 +66,7 @@ xcodebuild \
 DesktopPet/
   EvanJoDesktopPet/           应用源码和运行时素材
   EvanJoDesktopPet.xcodeproj/ Xcode 项目
+  EvanJoDesktopPet.Windows/   Windows 应用及打包脚本
   docs/                       架构与素材文档
 ```
 

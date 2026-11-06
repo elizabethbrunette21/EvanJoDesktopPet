@@ -11,6 +11,8 @@ namespace EvanJoDesktopPet.Windows.Characters.EvanJo.Animation;
 /// </summary>
 public sealed class EvanJoHappyAnimationController
 {
+    private const double FlowerSizeScale = 1.8;
+    private const double FlowerInitialScale = 0.4 * FlowerSizeScale;
     private static readonly Vector[] FlowerMidpointOffsets =
     {
         new(-10, -15),
@@ -95,11 +97,7 @@ public sealed class EvanJoHappyAnimationController
         ResetVisualState();
 
         var storyboard = new Storyboard { FillBehavior = FillBehavior.Stop };
-        AddTimeline(
-            storyboard,
-            characterTranslateTransform,
-            TranslateTransform.YProperty,
-            CreateJumpFrames());
+        characterTranslateTransform.BeginAnimation(TranslateTransform.YProperty, CreateJumpFrames());
         AddTimeline(
             storyboard,
             jumpLinesElement,
@@ -110,29 +108,20 @@ public sealed class EvanJoHappyAnimationController
         {
             var appearanceStart = TimeSpan.FromSeconds(index * 0.04);
             var appearanceEnd = appearanceStart + TimeSpan.FromSeconds(0.12);
-            var finalEnd = appearanceEnd + TimeSpan.FromSeconds(0.12);
-            var fadeStart = TimeSpan.FromSeconds(0.59 + (index * 0.04));
-            var fadeEnd = fadeStart + TimeSpan.FromSeconds(0.22);
+            var finalEnd = appearanceEnd + TimeSpan.FromSeconds(0.38);
+            var fadeStart = TimeSpan.FromSeconds(1.15 + (index * 0.04));
+            var fadeEnd = fadeStart + TimeSpan.FromSeconds(0.35);
 
             AddTimeline(
                 storyboard,
                 flowerElements[index],
                 UIElement.OpacityProperty,
                 CreateFlowerOpacityFrames(appearanceStart, appearanceEnd, fadeStart, fadeEnd));
-            AddTimeline(
-                storyboard,
-                flowerScaleTransforms[index],
-                ScaleTransform.ScaleXProperty,
+            flowerScaleTransforms[index].BeginAnimation(ScaleTransform.ScaleXProperty,
                 CreateFlowerScaleFrames(appearanceStart, appearanceEnd, fadeEnd));
-            AddTimeline(
-                storyboard,
-                flowerScaleTransforms[index],
-                ScaleTransform.ScaleYProperty,
+            flowerScaleTransforms[index].BeginAnimation(ScaleTransform.ScaleYProperty,
                 CreateFlowerScaleFrames(appearanceStart, appearanceEnd, fadeEnd));
-            AddTimeline(
-                storyboard,
-                flowerTranslateTransforms[index],
-                TranslateTransform.XProperty,
+            flowerTranslateTransforms[index].BeginAnimation(TranslateTransform.XProperty,
                 CreateFlowerMovementFrames(
                     FlowerMidpointOffsets[index].X,
                     FlowerFinalOffsets[index].X,
@@ -140,10 +129,7 @@ public sealed class EvanJoHappyAnimationController
                     appearanceEnd,
                     finalEnd,
                     fadeEnd));
-            AddTimeline(
-                storyboard,
-                flowerTranslateTransforms[index],
-                TranslateTransform.YProperty,
+            flowerTranslateTransforms[index].BeginAnimation(TranslateTransform.YProperty,
                 CreateFlowerMovementFrames(
                     FlowerMidpointOffsets[index].Y,
                     FlowerFinalOffsets[index].Y,
@@ -240,14 +226,14 @@ public sealed class EvanJoHappyAnimationController
     {
         var frames = new DoubleAnimationUsingKeyFrames();
         frames.KeyFrames.Add(new DiscreteDoubleKeyFrame(
-            0.4,
+            FlowerInitialScale,
             KeyTime.FromTimeSpan(TimeSpan.Zero)));
         frames.KeyFrames.Add(new DiscreteDoubleKeyFrame(
-            0.4,
+            FlowerInitialScale,
             KeyTime.FromTimeSpan(appearanceStart)));
-        frames.KeyFrames.Add(CreateEasedFrame(1, appearanceEnd, EasingMode.EaseOut));
+        frames.KeyFrames.Add(CreateEasedFrame(FlowerSizeScale, appearanceEnd, EasingMode.EaseOut));
         frames.KeyFrames.Add(new DiscreteDoubleKeyFrame(
-            1,
+            FlowerSizeScale,
             KeyTime.FromTimeSpan(finish)));
         return frames;
     }
@@ -309,14 +295,19 @@ public sealed class EvanJoHappyAnimationController
 
     private void ResetVisualState()
     {
+        characterTranslateTransform.BeginAnimation(TranslateTransform.YProperty, null);
         characterTranslateTransform.Y = 0;
         jumpLinesElement.Opacity = 0;
 
         for (var index = 0; index < flowerElements.Count; index++)
         {
+            flowerScaleTransforms[index].BeginAnimation(ScaleTransform.ScaleXProperty, null);
+            flowerScaleTransforms[index].BeginAnimation(ScaleTransform.ScaleYProperty, null);
+            flowerTranslateTransforms[index].BeginAnimation(TranslateTransform.XProperty, null);
+            flowerTranslateTransforms[index].BeginAnimation(TranslateTransform.YProperty, null);
             flowerElements[index].Opacity = 0;
-            flowerScaleTransforms[index].ScaleX = 0.4;
-            flowerScaleTransforms[index].ScaleY = 0.4;
+            flowerScaleTransforms[index].ScaleX = FlowerInitialScale;
+            flowerScaleTransforms[index].ScaleY = FlowerInitialScale;
             flowerTranslateTransforms[index].X = 0;
             flowerTranslateTransforms[index].Y = 0;
         }
