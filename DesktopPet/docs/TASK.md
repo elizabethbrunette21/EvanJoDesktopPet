@@ -20,5 +20,8 @@ The character behavior probe and routed WPF mouse-up probe passed earlier for
 Idle → Happy and Loading → Brainwave. A Windows x64 self-contained publish passed
 with the temporary .NET 8.0.426 SDK. The ZIP contains the executable and installer
 scripts, and the executable icon can be extracted. The installed executable hash
-matches the package; the desktop shortcut targets it and uses its icon. GitHub
-Release publication and live download verification remain pending.
+matches the package; the desktop shortcut targets it and uses its icon. The
+Windows Release workflow passed; GitHub lists the ZIP as uploaded at the
+exact URL used in both READMEs. The installed app is running. Ordinary
+system-level clicks still need user review because injected clicks were not
+delivered in this tool session.
