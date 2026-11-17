@@ -1,0 +1,18 @@
+EvanJoDesktopPet recovery / 项目恢复说明
+
+备份日期：2026-11-16
+私有 GitHub 完整备份：
+https://github.com/elizabethbrunette21/EvanJoDesktopPet-private-backup/releases/tag/backup-2026-11-16
+
+下载 Pet-EvanJo-backup-2026-11-16.zip 并解压，即可恢复全部原项目文件（包括隐藏的 .git、开发分支、原始素材、Windows 压缩包）。需要登录有权限的 GitHub 账户。
+ZIP: 65519603 bytes
+SHA-256: a36fdd2f037649850861f21d9126bc7f8174d1d861988555227651ddf934e486
+压缩包内 BACKUP-MANIFEST.json 包含 1612 个文件的 SHA-256。云端附件大小和校验值已与本地核对一致。
+
+原公开代码仓库（包含比本地快照更新的主分支）：
+https://github.com/elizabethbrunette21/EvanJoDesktopPet
+私有备份还直接保存了 main、work/auto-roam-paused 分支及 v0.1.0 标签。
+
+凭据：项目目录未发现独立密钥文件。系统钥匙串、SSH/GitHub 全局凭据及项目目录外的所有文件均未改动；它们未作为独立凭据备份导出。未来签名发布仍需原 Mac 钥匙串或单独保存的签名凭据。
+
+本地清理仅针对 /Users/liz/Documents/Pet-EvanJo 内已校验备份的内容，保留此说明。

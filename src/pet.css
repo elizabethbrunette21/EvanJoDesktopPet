@@ -1,0 +1,10 @@
+:root { color-scheme: light; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: transparent; user-select: none; }
+main { position: relative; width: 100%; height: 100%; }
+#pet { position: absolute; bottom: 0; left: 8px; width: 192px; height: 208px; padding: 0; border: 0; background: transparent; cursor: grab; touch-action: none; }
+#pet:active { cursor: grabbing; }
+#pet:focus-visible { outline: 2px dashed #ba3d43; outline-offset: -8px; border-radius: 40%; }
+#sprite { width: 192px; height: 208px; pointer-events: none; }
+#status { position: absolute; bottom: 0; margin: 0; width: 100%; padding: 12px; color: #542d33; background: #fff8f1; font-size: 12px; text-align: center; }
+#bubble { position: absolute; z-index: 1; top: 6px; left: 12px; max-width: 184px; margin: 0; padding: 7px 11px; border: 1px solid #a76162; border-radius: 14px 14px 4px 14px; background: #fff8f1; color: #542d33; font-size: 13px; line-height: 1.5; pointer-events: none; }

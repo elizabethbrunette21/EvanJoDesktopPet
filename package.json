@@ -1,0 +1,31 @@
+{
+  "name": "evan-desktop-pet",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Evan · macOS 与 Windows 桌面小人",
+  "author": "EvanJo",
+  "main": "src/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test",
+    "smoke": "electron . --smoke-test",
+    "smoke:packaged": "node scripts/smoke-packaged.cjs",
+    "pack": "electron-builder --dir --publish never",
+    "build:mac": "electron-builder --mac --universal --publish never",
+    "build:win": "electron-builder --win --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.3.2",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.evanjo.desktop-pet",
+    "productName": "Evan",
+    "asar": true,
+    "directories": { "output": "dist" },
+    "files": ["src/**/*", "assets/**/*", "package.json", "LICENSE", "ASSET_LICENSE.md"],
+    "mac": { "target": ["dmg", "zip"], "category": "public.app-category.entertainment" },
+    "win": { "target": ["nsis", "zip"] },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true }
+  }
+}

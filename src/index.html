@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'">
+  <title>Evan</title>
+  <link rel="stylesheet" href="pet.css">
+</head>
+<body>
+  <main>
+    <p id="bubble" role="status" aria-live="polite" hidden></p>
+    <button id="pet" aria-label="Evan，点击互动，拖动移动，右键打开菜单">
+      <canvas id="sprite" width="480" height="520" aria-hidden="true"></canvas>
+    </button>
+    <p id="status" role="status">Evan 正在醒来…</p>
+  </main>
+  <script type="module" src="pet.js"></script>
+</body>
+</html>
