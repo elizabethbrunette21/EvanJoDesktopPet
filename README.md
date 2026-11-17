@@ -32,6 +32,8 @@ npm run smoke
 
 `.github/workflows/build.yml` 在推送 main、codex 分支、PR 或手动触发时，分别使用 macOS 和 Windows runner 执行单元测试、源码启动检查、打包及打包后启动检查，再上传构建附件。检查必须收到完整通过标记并正常退出。
 
+[双端 CI 已通过](https://github.com/elizabethbrunette21/EvanJoDesktopPet/actions/runs/44058345033)，可在该页面下载 Mac 通用包和 Windows x64 包。启动检查分别验证正常动画与减弱动态效果，日常使用仍遵循系统偏好。
+
 当前为未签名开发版本；正式分发前仍需配置 macOS 签名／公证及 Windows 代码签名。Windows ARM64 尚未列入构建目标。
 
 安装方法与两端实机检查见 [安装与验收](docs/install-and-check.md)，已完成的本机检查见 [验证记录](docs/validation.md)。
