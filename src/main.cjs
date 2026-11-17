@@ -131,7 +131,11 @@ else {
     await win.loadFile(path.join(__dirname, 'index.html'));
     win.showInactive(); publish(false);
     if (smoke) {
-      await require('./smoke.cjs')({ win, app, action, change, settings, hidePet, showPet, motion, screen });
+      win.webContents.debugger.attach('1.3');
+      const setReducedMotion = reduce => win.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', {
+        features: [{ name: 'prefers-reduced-motion', value: reduce ? 'reduce' : 'no-preference' }]
+      });
+      await require('./smoke.cjs')({ win, app, action, change, settings, hidePet, showPet, motion, screen, setReducedMotion });
       return;
     }
     tray = new Tray(path.join(__dirname, '../assets/tray.png')); tray.setToolTip('Evan');

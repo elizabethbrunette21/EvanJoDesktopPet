@@ -3,9 +3,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { SIZE } = require('./position.cjs');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-module.exports = async ({ win, app, action, change, settings, hidePet, showPet, motion, screen }) => {
+module.exports = async ({ win, app, action, change, settings, hidePet, showPet, motion, screen, setReducedMotion }) => {
   const evaluate = code => win.webContents.executeJavaScript(code);
   const snapshot = () => evaluate('window.petDiagnostics.snapshot()');
+  const media = async reduce => {
+    await setReducedMotion(reduce);
+    for (let i = 0; i < 20 && (await snapshot()).reduced !== reduce; i++) await delay(50);
+    assert.equal((await snapshot()).reduced, reduce, 'Reduced motion media must update');
+  };
   try {
     for (let i = 0; i < 150; i++) {
       const ready = await evaluate("document.querySelector('#pet').dataset.ready === 'true'");
@@ -14,6 +19,11 @@ module.exports = async ({ win, app, action, change, settings, hidePet, showPet, 
       if (error) throw new Error(error);
       await delay(100);
     }
+    console.log('Smoke environment:', JSON.stringify({ platform: process.platform, initial: await snapshot(),
+      visible: win.isVisible(), minimized: win.isMinimized(),
+      visibility: await evaluate('document.visibilityState') }));
+    // CI desktops can disable animation at OS level. Exercise both preferences explicitly.
+    await media(false);
     const first = await snapshot(); assert.equal(first.sheets, 6);
     assert.deepEqual(win.getSize(), [SIZE.width, SIZE.height]);
     assert.deepEqual(await evaluate(`(() => {
@@ -55,7 +65,8 @@ module.exports = async ({ win, app, action, change, settings, hidePet, showPet, 
     assert.ok(shape.originalLegs.every(alpha => alpha > 128));
     assert.equal(shape.wings, 2); assert.ok(shape.wingPixelsChanged > 0);
     assert.equal(shape.protectedPixelsChanged, 0);
-    await delay(300); assert.ok((await snapshot()).frames > first.frames);
+    await delay(300); assert.ok((await snapshot()).frames > first.frames,
+      `Animation did not advance: ${JSON.stringify(await snapshot())}`);
     assert.equal(await evaluate('typeof require'), 'undefined'); assert.ok(win.isAlwaysOnTop());
     const captureDir = path.join(app.getPath('temp'), 'evan-motion-smoke'); fs.mkdirSync(captureDir, { recursive: true });
     for (const name of first.clips) {
@@ -166,7 +177,15 @@ module.exports = async ({ win, app, action, change, settings, hidePet, showPet, 
       }
       console.log('Preview frames:', framesDir);
     }
-    console.log('Evan motion smoke passed:', JSON.stringify({ clips: first.clips.length, cells: first.cells, captures: captureDir, reduced: first.reduced }));
+    action('idle'); await media(true); await delay(150);
+    const reduced = await snapshot(), reducedPosition = win.getPosition();
+    await delay(200);
+    assert.equal((await snapshot()).frames, reduced.frames);
+    assert.equal((await snapshot()).clock, reduced.clock);
+    assert.deepEqual(win.getPosition(), reducedPosition);
+    await media(false); await delay(150);
+    assert.ok((await snapshot()).frames > reduced.frames);
+    console.log('Evan motion smoke passed:', JSON.stringify({ clips: first.clips.length, cells: first.cells, captures: captureDir, reducedMotionChecked: true }));
     app.exit(0);
   } catch (error) { console.error(error); app.exit(1); }
 };
